@@ -1,10 +1,11 @@
 SCREEN 1280,720
 FrameLimit 60 
-Global WORLD_SIZE, REGION_SIZE, WORLD_SEED
+Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE
 
-WORLD_SIZE = 80
+WORLD_SIZE = 100
 REGION_SIZE = 1000
 WORLD_SEED = 123441234+3
+BOX_SIZE = 7
 
 Dim temp_map(WORLD_SIZE-1,WORLD_SIZE-1)
 Dim temp_map2(WORLD_SIZE-1,WORLD_SIZE-1)
@@ -26,7 +27,7 @@ Repeat
     Randomize WORLD_SEED
     For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
         GetBiomeColor(wrsq\biome)  
-        Box wrsq\x*7+10,wrsq\y*7+10, 7, 7
+        Box wrsq\x*BOX_SIZE+10,wrsq\y*BOX_SIZE+10, BOX_SIZE, BOX_SIZE
     Next wrsq
     Randomize Timer()+Rand(1000)
     
@@ -45,6 +46,8 @@ Function GetBiome(id)
         Return "beach"
     ElseIf id = 3
         Return "forest"
+    ElseIf id = 4
+        Return "town"
     EndIf 
 End Function 
 
@@ -57,11 +60,14 @@ Function GetBiomeColor(id)
         Color 200+Rand(-15,15),255+Rand(-30,0),0
     ElseIf id = 3
         Color 0,Rand(125,170),0
+    ElseIf id = 4
+        Color 255,0,0
     EndIf     
 End Function 
 
 Function GenerateWorldMap(ratio,seed)
     Randomize seed
+    Notify("Initializing world")
     For x = 0 To WORLD_SIZE-1
         For y = 0 To WORLD_SIZE-1
             If x > 2 And x < WORLD_SIZE-3 And y > 2 And y < WORLD_SIZE-3
@@ -76,6 +82,7 @@ Function GenerateWorldMap(ratio,seed)
         Next y
     Next x
     
+    Notify("Creating oceans and land")
     For n = 1 To 6
         For x = 0 To WORLD_SIZE-1
             For y = 0 To WORLD_SIZE-1
@@ -118,6 +125,7 @@ Function GenerateWorldMap(ratio,seed)
         Next x
     Next n
     
+    Notify("Making beaches")
     For x = 0 To WORLD_SIZE-1
         For y = 0 To WORLD_SIZE-1
             If temp_map(x,y) = 1 
@@ -133,6 +141,7 @@ Function GenerateWorldMap(ratio,seed)
         Next y 
     Next x
     
+    Notify("Trimming beaches")
     For x = 0 To WORLD_SIZE-1
         For y = 0 To WORLD_SIZE-1
             If temp_map(x,y) = 2 
@@ -150,6 +159,7 @@ Function GenerateWorldMap(ratio,seed)
         Next y 
     Next x   
     
+    Notify("Growing forests")
     For x = 0 To WORLD_SIZE-1
         For y = 0 To WORLD_SIZE-1
             rd = Rand(-1,1)
@@ -173,6 +183,29 @@ Function GenerateWorldMap(ratio,seed)
         Next y 
     Next x   
     
+    Notify("Building towns")
+    town_count = 0
+    While town_count <= 10
+        x = Rand(WORLD_SIZE-1)
+        y = Rand(WORLD_SIZE-1)
+        If temp_map(x,y) = 1
+            town_found = True
+            For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
+                For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                    If xx = x And yy = y
+                    Else
+                        If temp_map(xx,yy) <> 1 Then town_found = False
+                    EndIf 
+                Next yy
+            Next xx     
+            If town_found = True
+                temp_map(x,y) = 4
+                town_count = town_count + 1
+            EndIf 
+        EndIf 
+    Wend 
+    
+    Notify("Finishing")
     For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
         Delete wrsq
     Next wrsq
@@ -189,4 +222,11 @@ Function GenerateWorldMap(ratio,seed)
             EndIf 
         Next y
     Next x
+    ClearText 
+End Function 
+
+Function Notify(notification$)
+    AddText notification$
+    'Text 10,10,notification$
+    DrawScreen 
 End Function 
