@@ -1,0 +1,192 @@
+SCREEN 1280,720
+FrameLimit 60 
+Global WORLD_SIZE, REGION_SIZE, WORLD_SEED
+
+WORLD_SIZE = 80
+REGION_SIZE = 1000
+WORLD_SEED = 123441234+3
+
+Dim temp_map(WORLD_SIZE-1,WORLD_SIZE-1)
+Dim temp_map2(WORLD_SIZE-1,WORLD_SIZE-1)
+Global temp_map()
+Global temp_map2()
+
+Type WORLD_SQUARE
+    Field x
+    Field y
+    Field biome
+End Type 
+
+GenerateWorldMap(58,WORLD_SEED)
+
+Repeat
+
+    SetWindow Str(FPS()+" SEED:"+WORLD_SEED)
+    
+    Randomize WORLD_SEED
+    For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
+        GetBiomeColor(wrsq\biome)  
+        Box wrsq\x*7+10,wrsq\y*7+10, 7, 7
+    Next wrsq
+    Randomize Timer()+Rand(1000)
+    
+    DrawScreen 
+    
+    If KeyHit(cbkeyescape) Then Exit 
+    
+Forever
+
+Function GetBiome(id)
+    If id = 0
+        Return "ocean"
+    ElseIf id = 1
+        Return "plains"
+    ElseIf id = 2
+        Return "beach"
+    ElseIf id = 3
+        Return "forest"
+    EndIf 
+End Function 
+
+Function GetBiomeColor(id)
+    If id = 0
+        Color 0,0,240+Rand(-15,15)
+    ElseIf id = 1
+        Color 0,240+Rand(-15,15),0
+    ElseIf id = 2
+        Color 200+Rand(-15,15),255+Rand(-30,0),0
+    ElseIf id = 3
+        Color 0,Rand(125,170),0
+    EndIf     
+End Function 
+
+Function GenerateWorldMap(ratio,seed)
+    Randomize seed
+    For x = 0 To WORLD_SIZE-1
+        For y = 0 To WORLD_SIZE-1
+            If x > 2 And x < WORLD_SIZE-3 And y > 2 And y < WORLD_SIZE-3
+                If Rand(100) < ratio
+                    temp_map(x,y) = 1
+                Else 
+                    temp_map(x,y) = 0
+                EndIf 
+            Else 
+                temp_map(x,y) = 0
+            EndIf  
+        Next y
+    Next x
+    
+    For n = 1 To 6
+        For x = 0 To WORLD_SIZE-1
+            For y = 0 To WORLD_SIZE-1
+                If y = 0 Or y = WORLD_SIZE-1 Or x = 0 Or x = WORLD_SIZE-1
+                    temp_map(x,y) = 1
+                Else
+                    If temp_map(x,y) = 1
+                        neighbours = 0
+                        For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
+                            For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                                If xx = x And yy = y
+                                Else
+                                    If temp_map(xx,yy) = 1 Then neighbours + 1
+                                EndIf 
+                            Next yy
+                        Next xx
+                        If neighbours >= 4 Then temp_map2(x,y) = 1 Else temp_map2(x,y) = 0
+                    ElseIf temp_map(x,y) = 0
+                        neighbours = 0
+                        For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
+                            For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                                If xx = x And yy = y
+                                Else
+                                    If temp_map(xx,yy) = 1 Then neighbours + 1
+                                EndIf 
+                            Next yy
+                        Next xx      
+                        If neighbours >= 5 Then temp_map2(x,y) = 1 Else temp_map2(x,y) = 0
+                    Else
+                        temp_map2(x,y) = temp_map(x,y)
+                    EndIf 
+                EndIf 
+            Next y
+        Next x
+    
+        For x = 0 To WORLD_SIZE-1
+            For y = 0 To WORLD_SIZE-1
+                temp_map(x,y) = temp_map2(x,y)
+            Next y
+        Next x
+    Next n
+    
+    For x = 0 To WORLD_SIZE-1
+        For y = 0 To WORLD_SIZE-1
+            If temp_map(x,y) = 1 
+                For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
+                    For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                        If xx = x And yy = y
+                        Else
+                            If temp_map(xx,yy) = 0 And Rand(100) > 40 Then temp_map(x,y) = 2
+                        EndIf 
+                    Next yy
+                Next xx                
+            EndIf 
+        Next y 
+    Next x
+    
+    For x = 0 To WORLD_SIZE-1
+        For y = 0 To WORLD_SIZE-1
+            If temp_map(x,y) = 2 
+                beach_found = False 
+                For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
+                    For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                        If xx = x And yy = y
+                        Else
+                            If temp_map(xx,yy) = 2 Then beach_found = True 
+                        EndIf 
+                    Next yy
+                Next xx     
+            If beach_found = False Then temp_map(x,y) = 1
+            EndIf 
+        Next y 
+    Next x   
+    
+    For x = 0 To WORLD_SIZE-1
+        For y = 0 To WORLD_SIZE-1
+            rd = Rand(-1,1)
+            If temp_map(x,y) = 1
+                sea_found = False 
+                For r = 0 To 90
+                    xr# = x
+                    yr# = y
+                    While Distance(x,y,xr#,yr#) < 4+rd
+                        If temp_map(Int(xr#),Int(yr#)) = 0
+                            sea_found = True 
+                            Exit 
+                        EndIf 
+                        xr# = xr# + 0.5*Cos(r*4)
+                        yr# = yr# + 0.5*Sin(r*4)
+                    Wend
+                    If sea_found = True Then Exit 
+                Next r
+                If sea_found = False Then temp_map(x,y) = 3
+            EndIf 
+        Next y 
+    Next x   
+    
+    For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
+        Delete wrsq
+    Next wrsq
+    
+    For x = 0 To WORLD_SIZE-1
+        For y = 0 To WORLD_SIZE-1
+            wrsq.WORLD_SQUARE = New(WORLD_SQUARE)
+            wrsq\x = x
+            wrsq\y = y
+            If x = 0 or y = 0 or x = WORLD_SIZE-1 or y = WORLD_SIZE-1
+                wrsq\biome = 0
+            Else 
+                wrsq\biome = temp_map(x,y)
+            EndIf 
+        Next y
+    Next x
+End Function 
