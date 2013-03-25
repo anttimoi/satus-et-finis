@@ -65,7 +65,7 @@ Function GenerateWorldMap(seed)
             If temp_map(x,y) = 1 
                 For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
                     For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
-                        If xx = x And yy = y
+                        If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
                         Else
                             If temp_map(xx,yy) = 0 And Rand(100) > 40 Then temp_map(x,y) = 2
                         EndIf 
@@ -82,7 +82,7 @@ Function GenerateWorldMap(seed)
                 beach_found = False 
                 For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
                     For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
-                        If xx = x And yy = y
+                        If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
                         Else
                             If temp_map(xx,yy) = 2 Then beach_found = True 
                         EndIf 
@@ -102,7 +102,7 @@ Function GenerateWorldMap(seed)
                 For r = 0 To 90
                     xr# = x
                     yr# = y
-                    While Distance(x,y,xr#,yr#) < 4+rd
+                    While Distance(x,y,xr#,yr#) < 3+rd
                         If temp_map(Int(xr#),Int(yr#)) = 0
                             sea_found = True 
                             Exit 
@@ -116,6 +116,77 @@ Function GenerateWorldMap(seed)
             EndIf 
         Next y 
     Next x   
+    
+    Notify("Making swamps")
+    For x = 0 To WORLD_SIZE-1
+        For y = 0 To WORLD_SIZE-1
+            If temp_map(x,y) = 1 
+                For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
+                    For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                        If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
+                        Else
+                            If temp_map(xx,yy) = 0 And Rand(100) < 30 Then temp_map(x,y) = 5
+                        EndIf 
+                    Next yy
+                Next xx                
+            EndIf 
+        Next y 
+    Next x
+    For n = 1 To 5
+        For x = 0 To WORLD_SIZE-1
+            For y = 0 To WORLD_SIZE-1
+                If temp_map(x,y) = 1 Or temp_map(x,y) = 2 
+                    For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
+                        For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                            If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
+                            Else
+                                'If temp_map(xx,yy) = 5 And Rand(100) < 5 Then temp_map(x,y) = 5
+                            EndIf 
+                        Next yy
+                    Next xx                
+                EndIf 
+            Next y 
+        Next x        
+    Next n
+    
+    Notify("Growing hills")
+    For x = 0 To WORLD_SIZE-1
+        For y = 0 To WORLD_SIZE-1
+            If temp_map(x,y) = 3
+                plains_found = False 
+                For r = 0 To 90
+                    xr# = x
+                    yr# = y
+                    While Distance(x,y,xr#,yr#) < 3
+                        If temp_map(Int(xr#),Int(yr#)) = 1
+                            plains_found = True 
+                            Exit 
+                        EndIf 
+                        xr# = xr# + 0.5*Cos(r*4)
+                        yr# = yr# + 0.5*Sin(r*4)
+                    Wend
+                    If plains_found = True Then Exit 
+                Next r
+                If plains_found = False Then temp_map(x,y) = 6
+            EndIf 
+        Next y 
+    Next x   
+    
+    Notify("Smoothing hillside")
+    For x = 0 To WORLD_SIZE-1
+        For y = 0 To WORLD_SIZE-1
+            If temp_map(x,y) = 3 
+                For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
+                    For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                        If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
+                        Else
+                            If temp_map(xx,yy) = 6 Then temp_map(x,y) = 7
+                        EndIf 
+                    Next yy
+                Next xx                
+            EndIf 
+        Next y 
+    Next x
     
     Notify("Building towns")
     town_count = 0
@@ -139,7 +210,7 @@ Function GenerateWorldMap(seed)
                 town_count = town_count + 1
             EndIf 
         EndIf 
-        If attempts > 100000 Then exit
+        If attempts > 100000 Then Exit
     Wend 
     
     Notify("Finishing")
@@ -222,6 +293,12 @@ Function GetBiome(id)
         Return "forest"
     ElseIf id = 4
         Return "town"
+    ElseIf id = 5
+        Return "swamp"
+    ElseIf id = 6
+        Return "mountain"
+    ElseIf id = 7
+        Return "hillside"
     EndIf 
 End Function 
 
@@ -236,6 +313,12 @@ Function GetBiomeColor(id)
         Color 0,Rand(125,170),0
     ElseIf id = 4
         Color 255,0,0
+    ElseIf id = 5
+        Color 95,125+Rand(-15,15),15
+    ElseIf id = 6
+        Color Rand(230,255),Rand(230,255),Rand(230,255)
+    ElseIf id = 7
+        Color Rand(75,125),Rand(125,170),Rand(75,125)
     EndIf     
 End Function 
 

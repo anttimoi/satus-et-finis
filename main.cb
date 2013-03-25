@@ -1,5 +1,5 @@
 SCREEN 1280,720
-FrameLimit 60 
+FrameLimit 30 
 Repeat
     AddText "n - new game"
     AddText "l - load game"
@@ -21,6 +21,8 @@ Type WORLD_SQUARE
     Field biome
     Field town_name As String
 End Type 
+
+DefaultMask ON, cbmagenta
 
 Global PLAYER_X, PLAYER_Y, PLAYER_REGION, PLAYER_SPEED, DRAW_REGION
 Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE, REGION_FLOOR
@@ -56,6 +58,7 @@ Dim temp_map2(WORLD_SIZE-1,WORLD_SIZE-1)
 Global temp_map()
 Global temp_map2()
 
+player_img = LoadAnimImage("player.png", 32, 32, 0, 12)
 
 GenerateWorldMap(WORLD_SEED)
 
@@ -95,10 +98,41 @@ Repeat
         DrawImage REGION_FLOOR, 10, 10
         If DRAW_REGION = PLAYER_REGION
             Color cbmagenta
-            Circle PLAYER_X+10, PLAYER_Y+10, 10, 1
             PLAYER_X = Min((REGION_SIZE-1)*BOX_SIZE,Max(0,PLAYER_X + PLAYER_SPEED*(RightKey()-LeftKey())))
             PLAYER_Y = Min((REGION_SIZE-1)*BOX_SIZE,Max(0,PLAYER_Y + PLAYER_SPEED*(DownKey()-UpKey())))
-            
+            If DownKey()
+                player_dir = 0
+                If (Timer()/300) Mod 2 = 0
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 2 
+                ElseIf (Timer()/300) Mod 2 = 1
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 1 
+                EndIf 
+            ElseIf UpKey()
+                player_dir = 1
+                If (Timer()/300) Mod 2 = 0
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 3 
+                ElseIf (Timer()/300) Mod 2 = 1
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 4 
+                EndIf  
+            ElseIf RightKey()
+                If (Timer()/300) Mod 2 = 0
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 6 
+                ElseIf (Timer()/300) Mod 2 = 1
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 7 
+                EndIf 
+            ElseIf LeftKey()
+                If (Timer()/300) Mod 2 = 0
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 10 
+                ElseIf (Timer()/300) Mod 2 = 1
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 11 
+                EndIf 
+            Else 
+                If player_dir = 0
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 0 
+                Else
+                    DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 5
+                EndIf 
+            EndIf 
             If PLAYER_X = (REGION_SIZE-1)*BOX_SIZE
                 Text 720,70, "Travel East?"
                 If KeyHit(cbkeyreturn) Then Travel(1,0)
