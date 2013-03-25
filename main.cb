@@ -1,0 +1,105 @@
+SCREEN 1280,720
+FrameLimit 60 
+Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE, REGION_ARRAY_SIZE
+
+WORLD_SIZE = 70
+REGION_SIZE = 70
+WORLD_SEED = 123441234+3
+BOX_SIZE = 10
+REGION_ARRAY_SIZE = 0
+
+Dim temp_map(WORLD_SIZE-1,WORLD_SIZE-1)
+Dim temp_map2(WORLD_SIZE-1,WORLD_SIZE-1)
+Global temp_map()
+Global temp_map2()
+
+Dim region(WORLD_SIZE^2)
+Global region()
+For i = 0 To WORLD_SIZE^2
+    region(i) = -1
+Next i
+
+Type WORLD_SQUARE
+    Field id
+    Field x
+    Field y
+    Field biome
+    Field town_name As String
+End Type 
+
+Global PLAYER_X, PLAYER_Y, PLAYER_REGION, PLAYER_SPEED
+PLAYER_X = 350
+PLAYER_Y = 350
+PLAYER_SPEED = 5
+PLAYER_REGION = -1
+
+REGION_FLOOR = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
+Global REGION_FLOOR
+
+GenerateWorldMap(WORLD_SEED,58)
+
+Global DRAW_REGION
+DRAW_REGION = -1
+
+Repeat
+
+    Color cbwhite
+    SetWindow Str(FPS()+" SEED:"+WORLD_SEED)
+    Text 720,30, "Regions generated: "+RegionCount()
+    
+    If DRAW_REGION = -1
+        Randomize WORLD_SEED
+        For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
+            GetBiomeColor(wrsq\biome)  
+            If wrsq\id = PLAYER_REGION And (Int(Timer()/500) Mod 2) = 0  Then Color cbmagenta
+            Box wrsq\x*BOX_SIZE+10,wrsq\y*BOX_SIZE+10, BOX_SIZE, BOX_SIZE
+            If (MouseX()-10)/BOX_SIZE = wrsq\x And (MouseY()-10)/BOX_SIZE = wrsq\y
+                Text 720,10,wrsq\x+" "+wrsq\y+" "+wrsq\id+" "+GetBiome(wrsq\biome)+" "+wrsq\town_name
+                If MouseHit(1)
+                    If region(wrsq\id) = -1
+                        region(wrsq\id) = wrsq\biome
+                    EndIf
+                    DRAW_REGION = wrsq\id
+                    If PLAYER_REGION <> -1 Then DRAW_REGION = PLAYER_REGION Else PLAYER_REGION = DRAW_REGION
+                    REGION_FLOOR = GenerateRegionFloor()
+                EndIf 
+            EndIf 
+        Next wrsq
+        Randomize Timer()+Rand(1000)
+    Else
+        DrawImage REGION_FLOOR, 10, 10
+        If DRAW_REGION = PLAYER_REGION
+            Color cbmagenta
+            Circle PLAYER_X+10, PLAYER_Y+10, 10, 1
+            PLAYER_X = Min((REGION_SIZE-1)*BOX_SIZE,Max(0,PLAYER_X + PLAYER_SPEED*(RightKey()-LeftKey())))
+            PLAYER_Y = Min((REGION_SIZE-1)*BOX_SIZE,Max(0,PLAYER_Y + PLAYER_SPEED*(DownKey()-UpKey())))
+            
+            If PLAYER_X = (REGION_SIZE-1)*BOX_SIZE
+                Text 720,70, "Travel East?"
+                If KeyHit(cbkeyreturn) Then Travel(1,0)
+            ElseIf PLAYER_X = 0
+                Text 720,70, "Travel West?"
+                If KeyHit(cbkeyreturn) Then Travel(-1,0)
+            ElseIf PLAYER_Y = (REGION_SIZE-1)*BOX_SIZE
+                Text 720,70, "Travel South?"
+                If KeyHit(cbkeyreturn) Then Travel(0,1)
+            ElseIf PLAYER_Y = 0
+                Text 720,70, "Travel North?"
+                If KeyHit(cbkeyreturn) Then Travel(0,-1)
+            EndIf 
+        EndIf 
+        
+        Text 720,10, DRAW_REGION+" "+GetBiome(region(DRAW_REGION))
+        Text 720,50, PLAYER_X+" "+PLAYER_Y
+        
+        If MouseHit(2) Then DRAW_REGION = -1
+    EndIf 
+    
+    DrawScreen 
+    
+    If KeyHit(cbkeyescape) Then Exit 
+    
+Forever
+
+Include "functions/general.cb"
+Include "functions/map.cb"

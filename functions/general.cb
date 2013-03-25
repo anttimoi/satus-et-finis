@@ -1,0 +1,111 @@
+Function Notify(notification$)
+    AddText notification$
+    DrawScreen 
+End Function 
+
+Function RandomName()
+    
+    voc_max = 5
+    cons_max = 15
+    Dim vocals(voc_max) As String  // a e i o u y
+    Dim consonants(cons_max) As String // m n p b t d k g f v s z x h r l
+    
+    vocals(0) = "a"
+    vocals(1) = "e"
+    vocals(2) = "i"
+    vocals(3) = "o"
+    vocals(4) = "u"
+    vocals(5) = "y"
+    
+    consonants(0) = "m" 
+    consonants(1) = "n" 
+    consonants(2) = "p" 
+    consonants(3) = "b" 
+    consonants(4) = "t" 
+    consonants(5) = "d" 
+    consonants(6) = "k" 
+    consonants(7) = "g" 
+    consonants(8) = "f" 
+    consonants(9) = "v" 
+    consonants(10) = "s" 
+    consonants(11) = "z" 
+    consonants(12) = "x" 
+    consonants(13) = "h" 
+    consonants(14) = "r" 
+    consonants(15) = "l" 
+    
+    name$ = ""
+    c = -1
+    r = Rand(2)
+    If r = 0
+        name$ = Upper(consonants(Rand(15)))+vocals(Rand(5))+consonants(Rand(15))
+    ElseIf r = 1
+        name$ = Upper(vocals(Rand(5)))+consonants(Rand(15))+vocals(Rand(5))
+    ElseIf r = 2
+        name$ = Upper(vocals(Rand(5)))+vocals(Rand(5))
+    EndIf 
+    r = Rand(3)    
+    If r = 0
+        name$ = name$ + vocals(Rand(5))+vocals(Rand(5))
+    ElseIf r = 1
+        rr = Rand(15)
+        name$ = name$ + consonants(Rand(15))+vocals(Rand(5))
+    ElseIf r = 2
+        name$ = name$ + vocals(Rand(5))
+    ElseIf r = 3
+        c = Rand(15)
+        name$ = name$ + consonants(c)
+    EndIf
+    r = Rand(2)
+    
+    If r = 0
+        name$ = name$ + consonants(Rand(15))+vocals(Rand(5))+consonants(Rand(15))
+    ElseIf r = 1
+        name$ = name$ + vocals(Rand(5))
+    ElseIf r = 2
+        If c > -1
+            name$ = name$ + consonants(c)
+        Else 
+            name$ = name$ + consonants(Rand(15))
+        EndIf 
+    EndIf 
+    
+    If Rand(5) = 1
+        name$ = name$ + "-"
+        r = Rand(2)
+        If r = 0
+            name$ = name$ + Upper(consonants(Rand(15)))+vocals(Rand(5))+consonants(Rand(15))
+        ElseIf r = 1
+            name$ = name$ + Upper(vocals(Rand(5)))+consonants(Rand(15))+vocals(Rand(5))
+        ElseIf r = 2
+            name$ = name$ + Upper(vocals(Rand(5)))+vocals(Rand(5))
+        EndIf 
+        r = Rand(3)    
+        If r = 0
+            name$ = name$ + vocals(Rand(5))+vocals(Rand(5))
+        ElseIf r = 1
+            rr = Rand(15)
+            name$ = name$ + consonants(Rand(15))+vocals(Rand(5))
+        ElseIf r = 2
+            name$ = name$ + vocals(Rand(5))
+        ElseIf r = 3
+            c = Rand(15)
+            name$ = name$ + consonants(c)
+        EndIf
+        r = Rand(2)
+        
+        If r = 0
+            name$ = name$ + consonants(Rand(15))+vocals(Rand(5))+consonants(Rand(15))
+        ElseIf r = 1
+            name$ = name$ + vocals(Rand(5))
+        ElseIf r = 2
+            If c > -1
+                name$ = name$ + consonants(c)
+            Else 
+                name$ = name$ + consonants(Rand(15))
+            EndIf 
+        EndIf        
+    EndIf 
+    
+    Return name$
+End Function 
