@@ -1,11 +1,11 @@
 
-Function GenerateWorldMap(seed,ratio)
+Function GenerateWorldMap(seed)
     Randomize seed
     Notify("Initializing world")
     For x = 0 To WORLD_SIZE-1
         For y = 0 To WORLD_SIZE-1
             If x > 2 And x < WORLD_SIZE-3 And y > 2 And y < WORLD_SIZE-3
-                If Rand(100) < ratio
+                If Rand(100) < 58
                     temp_map(x,y) = 1
                 Else 
                     temp_map(x,y) = 0
@@ -119,7 +119,9 @@ Function GenerateWorldMap(seed,ratio)
     
     Notify("Building towns")
     town_count = 0
+    attempts = 0
     While town_count <= 10
+        attempts = attempts + 1
         x = Rand(WORLD_SIZE-1)
         y = Rand(WORLD_SIZE-1)
         If temp_map(x,y) = 1
@@ -137,6 +139,7 @@ Function GenerateWorldMap(seed,ratio)
                 town_count = town_count + 1
             EndIf 
         EndIf 
+        If attempts > 100000 Then exit
     Wend 
     
     Notify("Finishing")
@@ -172,12 +175,13 @@ Function RegionCount()
     Return count 
 End Function 
 
-Function GenerateRegionFloor()
+Function GenerateRegionFloor(id)
+    Randomize WORLD_SEED
     img = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
     DrawToImage img
     For x = 0 To REGION_SIZE-1
         For y = 0 To REGION_SIZE-1
-            GetFloorColor(region(DRAW_REGION))    
+            GetFloorColor(region(id))    
             Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
         Next y
     Next x
@@ -204,7 +208,7 @@ Function Travel(x,y)
             if y <> 0 then PLAYER_Y = Max(0,(REGION_SIZE-1)*BOX_SIZE*y*-1)
         EndIf 
     Next wrsq    
-    REGION_FLOOR = GenerateRegionFloor()
+    REGION_FLOOR = GenerateRegionFloor(DRAW_REGION)
 End Function 
 
 Function GetBiome(id)

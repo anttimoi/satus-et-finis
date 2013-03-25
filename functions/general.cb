@@ -109,3 +109,36 @@ Function RandomName()
     
     Return name$
 End Function 
+
+Function SaveGame(filename$)
+    if FileExists("saves/"+filename$+".save") Then DeleteFile "saves/"+filename$+".save"
+    f = OpenToEdit("saves/"+filename$+".save")
+    WriteLine f, WORLD_SEED
+    WriteLine f, DRAW_REGION
+    WriteLine f, PLAYER_REGION
+    WriteLine f, PLAYER_X
+    WriteLine f, PLAYER_Y
+    For i = 0 To WORLD_SIZE^2
+        If region(i) <> -1
+            WriteLine f, i
+            WriteLine f, region(i)
+        EndIf 
+    Next i
+    CloseFile f
+End Function 
+
+Function LoadGame(filename$)
+    f = OpenToRead("saves/"+filename$+".save")
+    WORLD_SEED = ReadLine(f)
+    DRAW_REGION = ReadLine(f)
+    PLAYER_REGION = ReadLine(f)
+    PLAYER_X = ReadLine(f)
+    PLAYER_Y = ReadLine(f)   
+    
+    Repeat
+        l = ReadLine(f)
+        region(l) = ReadLine(f)    
+    Until EOF(f)
+    Notify("Savefile loaded")
+    CloseFile f
+End Function 
