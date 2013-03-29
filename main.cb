@@ -72,12 +72,7 @@ Repeat
     EndIf 
 Forever 
 
-If new_game = True 
-    Randomize Timer()
-    Notify("Starting a new game!")
-Else 
-    LoadGame("1")
-EndIf 
+Notify("Starting a new game!")
 
 GenerateWorldMap(WORLD_SEED)
 
@@ -148,8 +143,6 @@ Repeat
 		
         'If MouseHit(2) Then draw_map = true
     EndIf 
-
-    If KeyHit(cbkeys) Then SaveGame("1")
     
     DrawScreen 
     
