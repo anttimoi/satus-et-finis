@@ -119,7 +119,7 @@ Function SaveGame(filename$)
     WriteLine f, PLAYER_X
     WriteLine f, PLAYER_Y
     For i = 0 To WORLD_SIZE^2
-        If region(i) <> -1
+        If region(i) <> 0
             WriteLine f, i
             WriteLine f, region(i)
         EndIf 

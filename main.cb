@@ -1,6 +1,8 @@
-SCREEN 1280,720
+SCREEN 1280,720,32
 FrameLimit 30 
 Repeat
+	new_game = True 
+	Exit	
     AddText "n - new game"
     AddText "l - load game"
     DrawScreen
@@ -33,7 +35,7 @@ BOX_SIZE = 10
 Dim region(WORLD_SIZE^2)
 Global region()
 For i = 0 To WORLD_SIZE^2
-    region(i) = -1
+    region(i) = 0
 Next i 
 REGION_FLOOR = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
 If new_game = True 
@@ -42,7 +44,7 @@ If new_game = True
     WORLD_SIZE = 70
     REGION_SIZE = 70
     WORLD_SEED = Rand(200000000)
-    BOX_SIZE = 10    
+    BOX_SIZE = 10   
     PLAYER_X = 350
     PLAYER_Y = 350
     PLAYER_REGION = -1   
@@ -62,9 +64,39 @@ player_img = LoadAnimImage("player.png", 32, 32, 0, 12)
 
 GenerateWorldMap(WORLD_SEED)
 
+background_img = makeimage(screenwidth(),screenheight())
+drawtoimage background_img
+	for x = 0 to screenwidth()/10-1
+		for y = 0 to screenheight()/10-1
+			if y = 0 or x = 0 or x = screenwidth()/10-1 or y = screenheight()/10-1 or x = 71
+				c = rand(70,100)
+				color c,c,c
+			else
+				color rand(90,110),rand(40,60),rand(10)
+			endif 
+			box x*10,y*10,10,10
+		next y
+	next x
+drawtoscreen
+
+If PLAYER_REGION = -1
+    Repeat
+        plains_found = False 
+        PLAYER_REGION = Rand(WORLD_SIZE^2)
+        For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
+            If PLAYER_REGION = wrsq\id And wrsq\biome = 1
+                plains_found = True
+            EndIf 
+        Next wrsq
+    Until plains_found = True 
+    'DRAW_REGION = PLAYER_REGION
+    UpdateLOS()
+EndIf 
+
 Repeat
 
     Color cbwhite
+	drawimage background_img,0,0
     SetWindow Str(FPS()+" SEED:"+WORLD_SEED)
     Text 720,30, "Regions generated: "+RegionCount()
     
@@ -72,7 +104,12 @@ Repeat
         Randomize WORLD_SEED
         For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
         
-            GetBiomeColor(wrsq\biome)  
+            if region(wrsq\id) = 1
+				GetBiomeColor(wrsq\biome) 
+			else
+				c = rand(0,10)
+				color c, c, c
+			endif 
             If wrsq\id = PLAYER_REGION And (Int(Timer()/500) Mod 2) = 0  Then Color cbmagenta
             Box wrsq\x*BOX_SIZE+10,wrsq\y*BOX_SIZE+10, BOX_SIZE, BOX_SIZE
             
@@ -80,11 +117,12 @@ Repeat
                 Text 720,10,wrsq\x+" "+wrsq\y+" "+wrsq\id+" "+GetBiome(wrsq\biome)+" "+wrsq\town_name
                 If MouseHit(1)
                     If PLAYER_REGION = -1
-                        If region(wrsq\id) = -1
-                            region(wrsq\id) = wrsq\biome
+                        If region(wrsq\id) = 0
+                            region(wrsq\id) = 1
                         EndIf
                         DRAW_REGION = wrsq\id
                         PLAYER_REGION = DRAW_REGION
+                        UpdateLOS()
                     Else 
                         DRAW_REGION = PLAYER_REGION
                     EndIf 
@@ -148,7 +186,7 @@ Repeat
             EndIf 
         EndIf 
         
-        Text 720,10, DRAW_REGION+" "+GetBiome(region(DRAW_REGION))
+        Text 720,10, DRAW_REGION+" "+GetBiome(DRAW_REGION)
         Text 720,50, PLAYER_X+" "+PLAYER_Y
         
         If MouseHit(2) Then DRAW_REGION = -1

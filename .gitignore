@@ -1,4 +1,4 @@
-###################
+﻿###################
 # compiled source #
 ###################
 *.com
@@ -11,6 +11,7 @@
 *.suo
 *.psd
 *.save
+*.bat
 # Include dlls if they’re in the NuGet packages directory
 !/packages/*/lib/*.dll
 # Include dlls if they're in the CommonReferences directory
