@@ -259,9 +259,9 @@ Function GenerateRegionFloor(id)
 End Function 
 
 Function Travel(x,y)
-	Loading()
+	'Loading()
     For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
-        If wrsq\id = DRAW_REGION
+        If wrsq\id = PLAYER_REGION
             current_x = wrsq\x
             current_y = wrsq\y
             Exit 
@@ -272,13 +272,12 @@ Function Travel(x,y)
             If region(wrsq\id) = 0
                 region(wrsq\id) = 1
             EndIf 
-            DRAW_REGION = wrsq\id
-            PLAYER_REGION = DRAW_REGION
+            PLAYER_REGION = wrsq\id
             if x <> 0 then PLAYER_X = Max(0,(REGION_SIZE-1)*BOX_SIZE*x*-1)
             if y <> 0 then PLAYER_Y = Max(0,(REGION_SIZE-1)*BOX_SIZE*y*-1)
         EndIf 
     Next wrsq    
-    DRAW_REGION_BIOME = IdToBiome(DRAW_REGION)
+    DRAW_REGION_BIOME = IdToBiome(PLAYER_REGION)
 	REGION_FLOOR_IMG = GenerateRegionFloor(DRAW_REGION_BIOME)
     UpdateLOS()
 End Function 
@@ -323,48 +322,33 @@ Function GetBiomeColor(id)
     EndIf     
 End Function 
 
-Function GetFloorColor(id)
-    If id = 0
-        Color 0,0,240+Rand(-15,15)
-    ElseIf id = 1   
-        Color 0,240+Rand(-15,15),0
-    ElseIf id = 2
-        Color 200+Rand(-15,15),255+Rand(-30,0),0
-    EndIf 
-End Function
-
 Function UpdateLOS()
     For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
         If wrsq\id = PLAYER_REGION
             x = wrsq\x
             y = wrsq\y
-			'region(wrsq\id) = 1
         EndIf
     Next wrsq
-    For r = 0 To 180
+    For r = 0 To 90
 		xx# = x
 		yy# = y
 		steps = 10
+		n = 0
         while steps > 0
-			xx# = xx# + cos(r*2)
-			yy# = yy# + sin(r*2)
-			square_found = false 
-			For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
-				If wrsq\x = int(xx#) and wrsq\y = int(yy#)
-					if wrsq\biome = 0
-						steps = steps-1
-					elseif wrsq\biome = 1 or wrsq\biome = 2 or wrsq\biome = 4 or wrsq\biome = 5
-						steps = steps-2
-					elseif wrsq\biome = 7 or wrsq\biome = 6 
-						steps = steps-5
-					else 
-						steps = steps-4
-					endif 
-					region(wrsq\id) = 1
-					square_found = true
-				endif
-			Next wrsq
-			if square_found = false then exit
+			xx# = min(WORLD_SIZE-1,max(0,xx# + cos(r*4)))
+			yy# = min(WORLD_SIZE-1,max(0,yy# + sin(r*4)))
+			if sight(int(xx#),int(yy#)) = 0
+				steps = steps-1
+			elseif sight(int(xx#),int(yy#)) = 1 or sight(int(xx#),int(yy#)) = 2 or sight(int(xx#),int(yy#)) = 4 or sight(int(xx#),int(yy#)) = 5
+				steps = steps-2
+			elseif sight(int(xx#),int(yy#)) = 7 or sight(int(xx#),int(yy#)) = 6 
+				steps = steps-5
+			else 
+				steps = steps-4
+			endif 
+			sight(int(xx#),int(yy#)) = -1
+			n = n+1
+			if n > 100 then exit
 		wend
     Next r
 End Function 
