@@ -189,27 +189,14 @@ Function GenerateWorldMap(seed)
     
     Notify("Building towns")
     town_count = 0
-    attempts = 0
     While town_count <= 10
         attempts = attempts + 1
         x = Rand(WORLD_SIZE-1)
         y = Rand(WORLD_SIZE-1)
         If temp_map(x,y) = 1
-            town_found = True
-            For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
-                For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
-                    If xx = x And yy = y
-                    Else
-                        If temp_map(xx,yy) <> 1 Then town_found = False
-                    EndIf 
-                Next yy
-            Next xx     
-            If town_found = True
-                temp_map(x,y) = 4
-                town_count = town_count + 1
-            EndIf 
+			temp_map(x,y) = 4
+			town_count = town_count + 1
         EndIf 
-        If attempts > 100000 Then Exit
     Wend 
     
     Notify("Finishing")
@@ -300,6 +287,13 @@ Function GetBiome(id)
     ElseIf id = 7
         Return "hillside"
     EndIf 
+End Function 
+
+Function LoadBiomeImgs(n)
+	for i = 0 to n
+		Biome_Img(i,0) = Loadimage("gfx/"+i+".png")
+		if i = 3 then Biome_Img(i,1) = Loadimage("gfx/"+i+"_1.png")
+	next i
 End Function 
 
 Function GetBiomeColor(id)

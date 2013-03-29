@@ -1,4 +1,4 @@
-SCREEN 1280,720,32
+SCREEN 1280,720
 FrameLimit 30 
 locate 10, 10
 
@@ -16,13 +16,11 @@ Global PLAYER_X, PLAYER_Y, PLAYER_REGION, PLAYER_SPEED, DRAW_REGION, DRAW_REGION
 Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE, REGION_FLOOR_IMG
 
 PLAYER_SPEED = 5
-WORLD_SIZE = 70
-REGION_SIZE = 70
 BOX_SIZE = 10  
-WORLD_SIZE = 70
-REGION_SIZE = 70
+WORLD_SIZE = 45
+REGION_SIZE = 45
 WORLD_SEED = Rand(200000000)
-BOX_SIZE = 10   
+BOX_SIZE = 16  
 PLAYER_X = 350
 PLAYER_Y = 350
 PLAYER_REGION = -1   
@@ -81,21 +79,16 @@ Else
     LoadGame("1")
 EndIf 
 
-player_img = LoadAnimImage("player.png", 32, 32, 0, 12)
-
 GenerateWorldMap(WORLD_SEED)
 
 Dim sight(WORLD_SIZE-1,WORLD_SIZE-1)
 Global sight()
-For x = 0 To WORLD_SIZE
-	for y = 0 to WORLD_SIZE
-		for wrsq.WORLD_SQUARE = each WORLD_SQUARE
-			if wrsq\x = x and wrsq\y = y
-				sight(x,y) = wrsq\biome
-			endif 
-		next wrsq
-	next y
-Next x 
+for wrsq.WORLD_SQUARE = each WORLD_SQUARE
+	if wrsq\x = x and wrsq\y = y
+		sight(wrsq\x,wrsq\y) = wrsq\biome
+	endif 
+next wrsq
+
 
 If PLAYER_REGION = -1
     Repeat
@@ -112,7 +105,10 @@ If PLAYER_REGION = -1
 EndIf 
 
 draw_map = true
-
+dim Biome_Img(7,1)
+global Biome_Img()
+LoadBiomeImgs(7)
+Player_Map_Img = loadimage("gfx/mapplayer.png")
 Repeat
 
     Color cbwhite
@@ -122,12 +118,19 @@ Repeat
     
     If draw_map = true
         Randomize WORLD_SEED
-		Drawimage unexplored_img, 10, 10
+		Drawimage unexplored_img, 0, 0
         For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
-				GetBiomeColor(wrsq\biome) 
+			treetype = rand(1)
+			GetBiomeColor(wrsq\biome) 
             if sight(wrsq\x,wrsq\y) = -1 or wrsq\id = PLAYER_REGION 
-				If wrsq\id = PLAYER_REGION And (Int(Timer()/500) Mod 2) = 0  Then Color cbmagenta
-				Box wrsq\x*BOX_SIZE+10,wrsq\y*BOX_SIZE+10, BOX_SIZE, BOX_SIZE
+				if wrsq\biome = 3
+					Drawimage Biome_Img(wrsq\biome,treetype),wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+				else
+					Drawimage Biome_Img(wrsq\biome,0),wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+				endif 
+				If wrsq\id = PLAYER_REGION
+					Drawimage Player_Map_Img,wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+				Endif 
 			endif 
             
             If (MouseX()-10)/BOX_SIZE = wrsq\x And (MouseY()-10)/BOX_SIZE = wrsq\y
@@ -139,64 +142,11 @@ Repeat
 		If KeyHit(cbkeydown) Then Travel(0,1)
 		If KeyHit(cbkeyup) Then Travel(0,-1)
 		If MouseHit(1)
-			draw_map = false
+			'draw_map = false
 		EndIf 
     Else
-        DrawImage region_floor_img, 10, 10
-		Color cbmagenta
-		PLAYER_X = Min((REGION_SIZE-1)*BOX_SIZE,Max(0,PLAYER_X + PLAYER_SPEED*(RightKey()-LeftKey())))
-		PLAYER_Y = Min((REGION_SIZE-1)*BOX_SIZE,Max(0,PLAYER_Y + PLAYER_SPEED*(DownKey()-UpKey())))
-		If DownKey()
-			player_dir = 0
-			If (Timer()/300) Mod 2 = 0
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 2 
-			ElseIf (Timer()/300) Mod 2 = 1
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 1 
-			EndIf 
-		ElseIf UpKey()
-			player_dir = 1
-			If (Timer()/300) Mod 2 = 0
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 3 
-			ElseIf (Timer()/300) Mod 2 = 1
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 4 
-			EndIf  
-		ElseIf RightKey()
-			If (Timer()/300) Mod 2 = 0
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 6 
-			ElseIf (Timer()/300) Mod 2 = 1
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 7 
-			EndIf 
-		ElseIf LeftKey()
-			If (Timer()/300) Mod 2 = 0
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 10 
-			ElseIf (Timer()/300) Mod 2 = 1
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 11 
-			EndIf 
-		Else 
-			If player_dir = 0
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 0 
-			Else
-				DrawImage player_img, PLAYER_X+10, PLAYER_Y+10, 5
-			EndIf 
-		EndIf 
-		If PLAYER_X = (REGION_SIZE-1)*BOX_SIZE
-			ShadeText(720,70, "Travel East?")
-			If KeyHit(cbkeyreturn) Then Travel(1,0)
-		ElseIf PLAYER_X = 0
-			ShadeText(720,70, "Travel West?")
-			If KeyHit(cbkeyreturn) Then Travel(-1,0)
-		ElseIf PLAYER_Y = (REGION_SIZE-1)*BOX_SIZE
-			ShadeText(720,70, "Travel South?")
-			If KeyHit(cbkeyreturn) Then Travel(0,1)
-		ElseIf PLAYER_Y = 0
-			ShadeText(720,70, "Travel North?")
-			If KeyHit(cbkeyreturn) Then Travel(0,-1)
-		EndIf
-        
-        ShadeText(720,10, PLAYER_REGION+" "+GetBiome(PLAYER_REGION))
-        ShadeText(720,50, PLAYER_X+" "+PLAYER_Y)
-        
-        If MouseHit(2) Then draw_map = true
+		
+        'If MouseHit(2) Then draw_map = true
     EndIf 
 
     If KeyHit(cbkeys) Then SaveGame("1")
