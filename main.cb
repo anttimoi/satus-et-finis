@@ -1,6 +1,41 @@
 SCREEN 1280,720,32
 FrameLimit 30 
+
+Type WORLD_SQUARE
+    Field id
+    Field x
+    Field y
+    Field biome
+    Field town_name As String
+End Type 
+
+Global PLAYER_X, PLAYER_Y, PLAYER_REGION, PLAYER_SPEED, DRAW_REGION, DRAW_REGION_BIOME
+Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE, REGION_FLOOR_IMG
+
+PLAYER_SPEED = 5
+WORLD_SIZE = 70
+REGION_SIZE = 70
+BOX_SIZE = 10  
+
+Dim region(WORLD_SIZE^2)
+Global region()
+For i = 0 To WORLD_SIZE^2
+    region(i) = 0
+Next i 
+
+Dim temp_map(WORLD_SIZE-1,WORLD_SIZE-1)
+Dim temp_map2(WORLD_SIZE-1,WORLD_SIZE-1)
+Global temp_map()
+Global temp_map2()
+
+global background_img
+GenerateBackground()
+
+font_default = loadfont("Fixedsys500c.ttf",15)
+setfont font_default
+
 Repeat
+	drawimage background_img, 0, 0
 	new_game = True 
 	Exit	
     AddText "n - new game"
@@ -16,28 +51,8 @@ Repeat
     EndIf 
 Forever 
 
-Type WORLD_SQUARE
-    Field id
-    Field x
-    Field y
-    Field biome
-    Field town_name As String
-End Type 
-
 DefaultMask ON, cbmagenta
 
-Global PLAYER_X, PLAYER_Y, PLAYER_REGION, PLAYER_SPEED, DRAW_REGION
-Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE, REGION_FLOOR
-PLAYER_SPEED = 5
-WORLD_SIZE = 70
-REGION_SIZE = 70
-BOX_SIZE = 10  
-Dim region(WORLD_SIZE^2)
-Global region()
-For i = 0 To WORLD_SIZE^2
-    region(i) = 0
-Next i 
-REGION_FLOOR = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
 If new_game = True 
     Randomize Timer()
     Notify("Starting a new game!")
@@ -51,33 +66,12 @@ If new_game = True
     DRAW_REGION = -1
 Else 
     LoadGame("1")
-    REGION_FLOOR = GenerateRegionFloor(DRAW_REGION)
 EndIf 
-
-    
-Dim temp_map(WORLD_SIZE-1,WORLD_SIZE-1)
-Dim temp_map2(WORLD_SIZE-1,WORLD_SIZE-1)
-Global temp_map()
-Global temp_map2()
 
 player_img = LoadAnimImage("player.png", 32, 32, 0, 12)
 
 GenerateWorldMap(WORLD_SEED)
 
-background_img = makeimage(screenwidth(),screenheight())
-drawtoimage background_img
-	for x = 0 to screenwidth()/10-1
-		for y = 0 to screenheight()/10-1
-			if y = 0 or x = 0 or x = screenwidth()/10-1 or y = screenheight()/10-1 or x = 71
-				c = rand(70,100)
-				color c,c,c
-			else
-				color rand(90,110),rand(40,60),rand(10)
-			endif 
-			box x*10,y*10,10,10
-		next y
-	next x
-drawtoscreen
 
 If PLAYER_REGION = -1
     Repeat
@@ -89,7 +83,8 @@ If PLAYER_REGION = -1
             EndIf 
         Next wrsq
     Until plains_found = True 
-    'DRAW_REGION = PLAYER_REGION
+    DRAW_REGION = PLAYER_REGION
+	REGION_FLOOR_IMG = GenerateRegionFloor(IdToBiome(DRAW_REGION))
     UpdateLOS()
 EndIf 
 
@@ -98,13 +93,13 @@ Repeat
     Color cbwhite
 	drawimage background_img,0,0
     SetWindow Str(FPS()+" SEED:"+WORLD_SEED)
-    Text 720,30, "Regions generated: "+RegionCount()
+    ShadeText(720,30, "Regions generated: "+RegionCount())
     
     If DRAW_REGION = -1
         Randomize WORLD_SEED
         For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
         
-            if region(wrsq\id) = 1
+            if region(wrsq\id) = 1 or wrsq\id = PLAYER_REGION 
 				GetBiomeColor(wrsq\biome) 
 			else
 				c = rand(0,10)
@@ -114,26 +109,19 @@ Repeat
             Box wrsq\x*BOX_SIZE+10,wrsq\y*BOX_SIZE+10, BOX_SIZE, BOX_SIZE
             
             If (MouseX()-10)/BOX_SIZE = wrsq\x And (MouseY()-10)/BOX_SIZE = wrsq\y
-                Text 720,10,wrsq\x+" "+wrsq\y+" "+wrsq\id+" "+GetBiome(wrsq\biome)+" "+wrsq\town_name
+                ShadeText(720,10,wrsq\x+" "+wrsq\y+" "+wrsq\id+" "+GetBiome(wrsq\biome)+" "+wrsq\town_name)
                 If MouseHit(1)
-                    If PLAYER_REGION = -1
-                        If region(wrsq\id) = 0
-                            region(wrsq\id) = 1
-                        EndIf
-                        DRAW_REGION = wrsq\id
-                        PLAYER_REGION = DRAW_REGION
-                        UpdateLOS()
-                    Else 
+                    If DRAW_REGION = -1			
                         DRAW_REGION = PLAYER_REGION
+						DRAW_REGION_BIOME = IdToBiome(DRAW_REGION)
                     EndIf 
-                    REGION_FLOOR = GenerateRegionFloor(DRAW_REGION)
                 EndIf 
             EndIf
             
         Next wrsq
 
     Else
-        DrawImage REGION_FLOOR, 10, 10
+        DrawImage region_floor_img, 10, 10
         If DRAW_REGION = PLAYER_REGION
             Color cbmagenta
             PLAYER_X = Min((REGION_SIZE-1)*BOX_SIZE,Max(0,PLAYER_X + PLAYER_SPEED*(RightKey()-LeftKey())))
@@ -172,22 +160,22 @@ Repeat
                 EndIf 
             EndIf 
             If PLAYER_X = (REGION_SIZE-1)*BOX_SIZE
-                Text 720,70, "Travel East?"
+                ShadeText(720,70, "Travel East?")
                 If KeyHit(cbkeyreturn) Then Travel(1,0)
             ElseIf PLAYER_X = 0
-                Text 720,70, "Travel West?"
+                ShadeText(720,70, "Travel West?")
                 If KeyHit(cbkeyreturn) Then Travel(-1,0)
             ElseIf PLAYER_Y = (REGION_SIZE-1)*BOX_SIZE
-                Text 720,70, "Travel South?"
+                ShadeText(720,70, "Travel South?")
                 If KeyHit(cbkeyreturn) Then Travel(0,1)
             ElseIf PLAYER_Y = 0
-                Text 720,70, "Travel North?"
+                ShadeText(720,70, "Travel North?")
                 If KeyHit(cbkeyreturn) Then Travel(0,-1)
             EndIf 
         EndIf 
         
-        Text 720,10, DRAW_REGION+" "+GetBiome(DRAW_REGION)
-        Text 720,50, PLAYER_X+" "+PLAYER_Y
+        ShadeText(720,10, DRAW_REGION+" "+GetBiome(DRAW_REGION))
+        ShadeText(720,50, PLAYER_X+" "+PLAYER_Y)
         
         If MouseHit(2) Then DRAW_REGION = -1
     EndIf 

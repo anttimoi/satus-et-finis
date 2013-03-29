@@ -1,4 +1,6 @@
 Function Notify(notification$)
+	drawimage background_img, 0, 0
+	color cbwhite
     AddText notification$
     DrawScreen 
 End Function 
@@ -142,3 +144,32 @@ Function LoadGame(filename$)
     Notify("Savefile loaded")
     CloseFile f
 End Function 
+
+function GenerateBackground()
+	background_img = makeimage(screenwidth(),screenheight())
+	drawtoimage background_img
+		for x = 0 to screenwidth()/10-1
+			for y = 0 to screenheight()/10-1
+				if y = 0 or x = 0 or x = screenwidth()/10-1 or y = screenheight()/10-1 or x = 71
+					c = rand(70,100)
+					color c,c,c
+				else
+					color rand(90,110),rand(40,60),rand(10)
+				endif 
+				box x*10,y*10,10,10
+			next y
+		next x
+	drawtoscreen
+end function 
+
+Function ShadeText(x,y,txt$,r=255,g=255,b=255)
+	color cbblack
+	text x+1,y+1,txt$
+	color r,g,b
+	text x,y,txt$
+End Function
+
+Function Loading()
+	ShadeText(10+(WORLD_SIZE*BOX_SIZE)/2-textwidth("Loading, please wait...")/2,10+(WORLD_SIZE*BOX_SIZE)/2,"Loading, please wait...")
+	Drawscreen 
+End Function

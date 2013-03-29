@@ -246,20 +246,20 @@ Function RegionCount()
 End Function 
 
 Function GenerateRegionFloor(id)
-    Randomize WORLD_SEED
-    img = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
-    DrawToImage img
-    For x = 0 To REGION_SIZE-1
-        For y = 0 To REGION_SIZE-1
-            GetFloorColor(region(id))    
-            Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
-        Next y
-    Next x
+	img = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
+	DrawToImage img
+	For x = 0 To REGION_SIZE-1
+		For y = 0 To REGION_SIZE-1
+			GetBiomeColor(id)    
+			Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
+		Next y
+	Next x
     DrawToScreen 
-    Return img
+	return img
 End Function 
 
 Function Travel(x,y)
+	Loading()
     For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
         If wrsq\id = DRAW_REGION
             current_x = wrsq\x
@@ -278,7 +278,8 @@ Function Travel(x,y)
             if y <> 0 then PLAYER_Y = Max(0,(REGION_SIZE-1)*BOX_SIZE*y*-1)
         EndIf 
     Next wrsq    
-    REGION_FLOOR = GenerateRegionFloor(DRAW_REGION)
+    DRAW_REGION_BIOME = IdToBiome(DRAW_REGION)
+	REGION_FLOOR_IMG = GenerateRegionFloor(DRAW_REGION_BIOME)
     UpdateLOS()
 End Function 
 
@@ -367,3 +368,11 @@ Function UpdateLOS()
 		wend
     Next r
 End Function 
+
+function IdToBiome(id)
+	for wrsq.WORLD_SQUARE = each WORLD_SQUARE
+		if wrsq\id = id
+			return wrsq\biome
+		endif
+	next wrsq
+end function 
