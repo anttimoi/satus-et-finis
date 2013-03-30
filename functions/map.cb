@@ -292,7 +292,15 @@ End Function
 Function LoadBiomeImgs(n)
 	for i = 0 to n
 		Biome_Img(i,0) = Loadimage("gfx/"+i+".png")
-		if i = 3 then Biome_Img(i,1) = Loadimage("gfx/"+i+"_1.png")
+		if i = 3
+			for x = 1 to 3
+				Biome_Img(i,x) = Loadimage("gfx/"+i+"_"+x+".png")
+			next x
+		elseif i = 6
+			for x = 1 to 2
+				Biome_Img(i,x) = Loadimage("gfx/"+i+"_"+x+".png")
+			next x			
+		endif 
 	next i
 End Function 
 
@@ -334,13 +342,14 @@ Function UpdateLOS()
 			if sight(int(xx#),int(yy#)) = 0
 				steps = steps-1
 			elseif sight(int(xx#),int(yy#)) = 1 or sight(int(xx#),int(yy#)) = 2 or sight(int(xx#),int(yy#)) = 4 or sight(int(xx#),int(yy#)) = 5
-				steps = steps-2
+				steps = steps-3
 			elseif sight(int(xx#),int(yy#)) = 7 or sight(int(xx#),int(yy#)) = 6 
-				steps = steps-5
+				steps = steps-6
 			else 
 				steps = steps-4
 			endif 
 			sight(int(xx#),int(yy#)) = -1
+			
 			n = n+1
 			if n > 100 then exit
 		wend

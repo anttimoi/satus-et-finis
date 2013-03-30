@@ -16,7 +16,6 @@ Global PLAYER_X, PLAYER_Y, PLAYER_REGION, PLAYER_SPEED, DRAW_REGION, DRAW_REGION
 Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE, REGION_FLOOR_IMG
 
 PLAYER_SPEED = 5
-BOX_SIZE = 10  
 WORLD_SIZE = 45
 REGION_SIZE = 45
 WORLD_SEED = Rand(200000000)
@@ -100,10 +99,11 @@ If PLAYER_REGION = -1
 EndIf 
 
 draw_map = true
-dim Biome_Img(7,1)
+dim Biome_Img(7,3)
 global Biome_Img()
 LoadBiomeImgs(7)
 Player_Map_Img = loadimage("gfx/mapplayer.png")
+Player_Map_Img2 = loadimage("gfx/mapplayerwater.png")
 Repeat
 
     Color cbwhite
@@ -115,16 +115,23 @@ Repeat
         Randomize WORLD_SEED
 		Drawimage unexplored_img, 0, 0
         For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
-			treetype = rand(1)
+			treetype = rand(3)
+			mountaintype = rand(2)
 			GetBiomeColor(wrsq\biome) 
             if sight(wrsq\x,wrsq\y) = -1 or wrsq\id = PLAYER_REGION 
 				if wrsq\biome = 3
 					Drawimage Biome_Img(wrsq\biome,treetype),wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+				elseif wrsq\biome = 6
+					Drawimage Biome_Img(wrsq\biome,mountaintype),wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
 				else
 					Drawimage Biome_Img(wrsq\biome,0),wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
 				endif 
 				If wrsq\id = PLAYER_REGION
-					Drawimage Player_Map_Img,wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+					if wrsq\biome = 0
+						Drawimage Player_Map_Img2,wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+					else
+						Drawimage Player_Map_Img,wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+					endif 
 				Endif 
 			endif 
             
