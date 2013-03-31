@@ -260,8 +260,6 @@ Function Travel(x,y)
                 region(wrsq\id) = 1
             EndIf 
             PLAYER_REGION = wrsq\id
-            if x <> 0 then PLAYER_X = Max(0,(REGION_SIZE-1)*BOX_SIZE*x*-1)
-            if y <> 0 then PLAYER_Y = Max(0,(REGION_SIZE-1)*BOX_SIZE*y*-1)
         EndIf 
     Next wrsq    
     DRAW_REGION_BIOME = IdToBiome(PLAYER_REGION)
@@ -362,4 +360,22 @@ function IdToBiome(id)
 			return wrsq\biome
 		endif
 	next wrsq
+end function 
+
+function SquareOnScreen(x,y)
+	if (x+WORLD_OFFSET_X < REGION_SIZE) and (y+WORLD_OFFSET_Y < REGION_SIZE) then return true else return false
+end function 
+
+function FixOffset()
+	for wrsq.WORLD_SQUARE = each WORLD_SQUARE
+		if wrsq\id = PLAYER_REGION
+			player_x = wrsq\x
+			player_y = wrsq\y
+		endif
+	next wrsq
+	
+	if player_x+5 >= REGION_SIZE-WORLD_OFFSET_X then WORLD_OFFSET_X = max(REGION_SIZE-WORLD_SIZE,WORLD_OFFSET_X-1)
+	if player_y+5 >= REGION_SIZE-WORLD_OFFSET_Y then WORLD_OFFSET_Y = max(REGION_SIZE-WORLD_SIZE,WORLD_OFFSET_Y-1)
+	if player_x-5 < -WORLD_OFFSET_X then WORLD_OFFSET_X = min(0,WORLD_OFFSET_X+1)
+	if player_y-5 < -WORLD_OFFSET_Y then WORLD_OFFSET_Y = min(0,WORLD_OFFSET_Y+1)
 end function 

@@ -12,16 +12,17 @@ Type WORLD_SQUARE
     Field town_name As String
 End Type 
 
-Global PLAYER_X, PLAYER_Y, PLAYER_REGION, PLAYER_SPEED, DRAW_REGION, DRAW_REGION_BIOME
+Global PLAYER_REGION, PLAYER_SPEED, DRAW_REGION, DRAW_REGION_BIOME
 Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE, REGION_FLOOR_IMG
+Global WORLD_OFFSET_X, WORLD_OFFSET_Y
 
 PLAYER_SPEED = 5
-WORLD_SIZE = 45
+WORLD_SIZE = 100
 REGION_SIZE = 45
 WORLD_SEED = Rand(200000000)
 BOX_SIZE = 16  
-PLAYER_X = 350
-PLAYER_Y = 350
+WORLD_OFFSET_X = 0
+WORLD_OFFSET_Y = 0
 PLAYER_REGION = -1   
 DRAW_REGION = -1
 
@@ -39,10 +40,10 @@ Global temp_map2()
 global background_img
 GenerateBackground()
 
-unexplored_img = MakeImage(WORLD_SIZE*BOX_SIZE,WORLD_SIZE*BOX_SIZE)
+unexplored_img = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
 DrawToImage unexplored_Img
-	for x = 0 to WORLD_SIZE-1
-		for y = 0 to WORLD_SIZE-1
+	for x = 0 to REGION_SIZE-1
+		for y = 0 to REGION_SIZE-1
 			c = rand(0,10)
 			color c, c, c	
 			Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
@@ -94,6 +95,7 @@ If PLAYER_REGION = -1
             EndIf 
         Next wrsq
     Until plains_found = True 
+	PLAYER_REGION = 10
 	REGION_FLOOR_IMG = GenerateRegionFloor(IdToBiome(PLAYER_REGION))
     UpdateLOS()
 EndIf 
@@ -110,6 +112,7 @@ Repeat
 	drawimage background_img,0,0
     SetWindow Str(FPS()+" SEED:"+WORLD_SEED)
     ShadeText(720,30, "Regions generated: "+RegionCount())
+	ShadeText(720,50, WORLD_OFFSET_X+" "+WORLD_OFFSET_Y)
     
     If draw_map = true
         Randomize WORLD_SEED
@@ -118,19 +121,19 @@ Repeat
 			treetype = rand(3)
 			mountaintype = rand(2)
 			GetBiomeColor(wrsq\biome) 
-            if sight(wrsq\x,wrsq\y) = -1 or wrsq\id = PLAYER_REGION 
+            if SquareOnScreen(wrsq\x,wrsq\y) and (sight(wrsq\x,wrsq\y) = -1 or wrsq\id = PLAYER_REGION)
 				if wrsq\biome = 3
-					Drawimage Biome_Img(wrsq\biome,treetype),wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+					Drawimage Biome_Img(wrsq\biome,treetype),(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
 				elseif wrsq\biome = 6
-					Drawimage Biome_Img(wrsq\biome,mountaintype),wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+					Drawimage Biome_Img(wrsq\biome,mountaintype),(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
 				else
-					Drawimage Biome_Img(wrsq\biome,0),wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+					Drawimage Biome_Img(wrsq\biome,0),(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
 				endif 
 				If wrsq\id = PLAYER_REGION
 					if wrsq\biome = 0
-						Drawimage Player_Map_Img2,wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+						Drawimage Player_Map_Img2,(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
 					else
-						Drawimage Player_Map_Img,wrsq\x*BOX_SIZE,wrsq\y*BOX_SIZE
+						Drawimage Player_Map_Img,(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
 					endif 
 				Endif 
 			endif 
@@ -143,9 +146,14 @@ Repeat
 		If KeyHit(cbkeyleft) Then Travel(-1,0)
 		If KeyHit(cbkeydown) Then Travel(0,1)
 		If KeyHit(cbkeyup) Then Travel(0,-1)
+		if keyhit(cbkeyw) then WORLD_OFFSET_Y + 1
+		if keyhit(cbkeya) then WORLD_OFFSET_X + 1
+		if keyhit(cbkeys) then WORLD_OFFSET_Y - 1
+		if keyhit(cbkeyd) then WORLD_OFFSET_X - 1
 		If MouseHit(1)
 			'draw_map = false
 		EndIf 
+		FixOffset()
     Else
 		
         'If MouseHit(2) Then draw_map = true
