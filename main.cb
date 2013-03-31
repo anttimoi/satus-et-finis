@@ -78,10 +78,12 @@ GenerateWorldMap(WORLD_SEED)
 
 Dim sight(WORLD_SIZE-1,WORLD_SIZE-1)
 Global sight()
+Dim biome(WORLD_SIZE-1,WORLD_SIZE-1)
+Global biome()
+
 for wrsq.WORLD_SQUARE = each WORLD_SQUARE
-	if wrsq\x = x and wrsq\y = y
-		sight(wrsq\x,wrsq\y) = wrsq\biome
-	endif 
+	sight(wrsq\x,wrsq\y) = 0
+	biome(wrsq\x,wrsq\y) = wrsq\biome
 next wrsq
 
 
@@ -106,6 +108,7 @@ global Biome_Img()
 LoadBiomeImgs(7)
 Player_Map_Img = loadimage("gfx/mapplayer.png")
 Player_Map_Img2 = loadimage("gfx/mapplayerwater.png")
+world_fog = makeimage(16,16)
 Repeat
 
     Color cbwhite
@@ -121,7 +124,7 @@ Repeat
 			treetype = rand(3)
 			mountaintype = rand(2)
 			GetBiomeColor(wrsq\biome) 
-            if SquareOnScreen(wrsq\x,wrsq\y) and (sight(wrsq\x,wrsq\y) = -1 or wrsq\id = PLAYER_REGION)
+            if SquareOnScreen(wrsq\x,wrsq\y) and sight(wrsq\x,wrsq\y) <= -1
 				if wrsq\biome = 3
 					Drawimage Biome_Img(wrsq\biome,treetype),(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
 				elseif wrsq\biome = 6
@@ -130,12 +133,15 @@ Repeat
 					Drawimage Biome_Img(wrsq\biome,0),(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
 				endif 
 				If wrsq\id = PLAYER_REGION
+					world_player_x = wrsq\x
+					world_player_y = wrsq\y
 					if wrsq\biome = 0
 						Drawimage Player_Map_Img2,(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
 					else
 						Drawimage Player_Map_Img,(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
 					endif 
 				Endif 
+			if sight(wrsq\x,wrsq\y) = -1 then DrawGhostImage world_fog,(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE, 0, FogThickness(wrsq\x,wrsq\y,world_player_x,world_player_y)
 			endif 
             
             If (MouseX()-10)/BOX_SIZE = wrsq\x And (MouseY()-10)/BOX_SIZE = wrsq\y

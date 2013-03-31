@@ -323,10 +323,16 @@ Function GetBiomeColor(id)
 End Function 
 
 Function UpdateLOS()
+	for x = 0 to WORLD_SIZE
+		for y = 0 to WORLD_SIZE
+			if sight(x,y) = -2 then sight(x,y) = -1
+		next y
+	next x
     For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
         If wrsq\id = PLAYER_REGION
             x = wrsq\x
             y = wrsq\y
+			sight(x,y) = -2
         EndIf
     Next wrsq
     For r = 0 To 90
@@ -337,16 +343,16 @@ Function UpdateLOS()
         while steps > 0
 			xx# = min(WORLD_SIZE-1,max(0,xx# + cos(r*4)))
 			yy# = min(WORLD_SIZE-1,max(0,yy# + sin(r*4)))
-			if sight(int(xx#),int(yy#)) = 0
+			if biome(int(xx#),int(yy#)) = 0
 				steps = steps-1
-			elseif sight(int(xx#),int(yy#)) = 1 or sight(int(xx#),int(yy#)) = 2 or sight(int(xx#),int(yy#)) = 4 or sight(int(xx#),int(yy#)) = 5
+			elseif biome(int(xx#),int(yy#)) = 1 or biome(int(xx#),int(yy#)) = 2 or biome(int(xx#),int(yy#)) = 4 or biome(int(xx#),int(yy#)) = 5
 				steps = steps-3
-			elseif sight(int(xx#),int(yy#)) = 7 or sight(int(xx#),int(yy#)) = 6 
+			elseif biome(int(xx#),int(yy#)) = 7 or biome(int(xx#),int(yy#)) = 6 
 				steps = steps-6
 			else 
 				steps = steps-4
 			endif 
-			sight(int(xx#),int(yy#)) = -1
+			sight(int(xx#),int(yy#)) = -2
 			
 			n = n+1
 			if n > 100 then exit
@@ -378,4 +384,9 @@ function FixOffset()
 	if player_y+5 >= REGION_SIZE-WORLD_OFFSET_Y then WORLD_OFFSET_Y = max(REGION_SIZE-WORLD_SIZE,WORLD_OFFSET_Y-1)
 	if player_x-5 < -WORLD_OFFSET_X then WORLD_OFFSET_X = min(0,WORLD_OFFSET_X+1)
 	if player_y-5 < -WORLD_OFFSET_Y then WORLD_OFFSET_Y = min(0,WORLD_OFFSET_Y+1)
+end function 
+
+function FogThickness(x,y,player_x,player_y)
+	d = 3*distance( x,y,player_x,player_y)
+	return max(1,min(70,d))
 end function 
