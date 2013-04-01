@@ -211,6 +211,7 @@ Function GenerateWorldMap(seed)
             wrsq\x = x
             wrsq\y = y
             wrsq\id = id
+			wrsq\visited = false
             id = id+1
             If x = 0 or y = 0 Or x = WORLD_SIZE-1 or y = WORLD_SIZE-1
                 'wrsq\biome = 0
@@ -225,11 +226,11 @@ Function GenerateWorldMap(seed)
 End Function 
 
 Function RegionCount()
-    count = 0
-    For i = 0 To WORLD_SIZE^2
-        If region(i) > 0 Then count = count + 1
-    Next i
-    Return count 
+	c = 0
+	For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
+		if wrsq\visited = true then c+1
+	Next wrsq
+	return c
 End Function 
 
 Function GenerateRegionFloor(id)
@@ -256,14 +257,10 @@ Function Travel(x,y)
     Next wrsq
     For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
         If wrsq\x = current_x+x And wrsq\y = current_y+y 
-            If region(wrsq\id) = 0
-                region(wrsq\id) = 1
-            EndIf 
+			wrsq\visited = true
             PLAYER_REGION = wrsq\id
         EndIf 
     Next wrsq    
-    DRAW_REGION_BIOME = IdToBiome(PLAYER_REGION)
-	REGION_FLOOR_IMG = GenerateRegionFloor(DRAW_REGION_BIOME)
     UpdateLOS()
 End Function 
 

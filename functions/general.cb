@@ -1,5 +1,4 @@
 Function Notify(notification$)
-	drawimage background_img, 0, 0
 	color cbwhite
     AddText notification$
     DrawScreen 
@@ -117,7 +116,7 @@ function GenerateBackground()
 	drawtoimage background_img
 		for x = 0 to screenwidth()/10-1
 			for y = 0 to screenheight()/10-1
-				if y = 0 or x = 0 or x = screenwidth()/10-1 or y = screenheight()/10-1 or x = 71
+				if y = 0 or x = 0 or x = screenwidth()/10-1 or y = screenheight()/10-1 or x = 72
 					c = rand(70,100)
 					color c,c,c
 				else
@@ -127,7 +126,24 @@ function GenerateBackground()
 			next y
 		next x
 	drawtoscreen
+	return background_img
 end function 
+
+function GenerateUnexplored()
+	unexplored_img = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
+	DrawToImage unexplored_Img
+		for x = 0 to REGION_SIZE-1
+			for y = 0 to REGION_SIZE-1
+				c = rand(0,10)
+				color c, c, c	
+				Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
+			next y
+		next x
+	DrawToScreen
+	return unexplored_img
+DrawToScreen
+
+end function
 
 Function ShadeText(x,y,txt$,r=255,g=255,b=255)
 	color cbblack

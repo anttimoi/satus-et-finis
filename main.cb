@@ -1,120 +1,11 @@
-SCREEN 1280,720
-FrameLimit 30 
-locate 10, 10
+include "include/init.cb"
 
-DefaultMask ON, cbmagenta
-
-Type WORLD_SQUARE
-    Field id
-    Field x
-    Field y
-    Field biome
-    Field town_name As String
-End Type 
-
-Global PLAYER_REGION, PLAYER_SPEED, DRAW_REGION, DRAW_REGION_BIOME
-Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE, REGION_FLOOR_IMG
-Global WORLD_OFFSET_X, WORLD_OFFSET_Y
-
-PLAYER_SPEED = 5
-WORLD_SIZE = 100
-REGION_SIZE = 45
-WORLD_SEED = Rand(200000000)
-BOX_SIZE = 16  
-WORLD_OFFSET_X = 0
-WORLD_OFFSET_Y = 0
-PLAYER_REGION = -1   
-DRAW_REGION = -1
-
-Dim region(WORLD_SIZE^2)
-Global region()
-For i = 0 To WORLD_SIZE^2
-    region(i) = 0
-Next i 
-
-Dim temp_map(WORLD_SIZE-1,WORLD_SIZE-1)
-Dim temp_map2(WORLD_SIZE-1,WORLD_SIZE-1)
-Global temp_map()
-Global temp_map2()
-
-global background_img
-GenerateBackground()
-
-unexplored_img = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
-DrawToImage unexplored_Img
-	for x = 0 to REGION_SIZE-1
-		for y = 0 to REGION_SIZE-1
-			c = rand(0,10)
-			color c, c, c	
-			Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
-		next y
-	next x
-DrawToScreen
-
-font_default = loadfont("Fixedsys500c.ttf",15)
-setfont font_default
-
-Repeat
-	drawimage background_img, 0, 0
-	drawimage unexplored_img, 10, 10
-	new_game = True 
-	Exit	
-    AddText "n - new game"
-    AddText "l - load game"
-    DrawScreen
-    ClearText
-    If KeyHit(cbkeyn)
-        new_game = True 
-        Exit
-    ElseIf KeyHit(cbkeyl)
-        new_game = False 
-        Exit 
-    EndIf 
-Forever 
-
-Notify("Starting a new game!")
-
-GenerateWorldMap(WORLD_SEED)
-
-Dim sight(WORLD_SIZE-1,WORLD_SIZE-1)
-Global sight()
-Dim biome(WORLD_SIZE-1,WORLD_SIZE-1)
-Global biome()
-
-for wrsq.WORLD_SQUARE = each WORLD_SQUARE
-	sight(wrsq\x,wrsq\y) = 0
-	biome(wrsq\x,wrsq\y) = wrsq\biome
-next wrsq
-
-
-If PLAYER_REGION = -1
-    Repeat
-        plains_found = False 
-        PLAYER_REGION = Rand(WORLD_SIZE^2)
-        For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
-            If PLAYER_REGION = wrsq\id And wrsq\biome = 1
-                plains_found = True
-            EndIf 
-        Next wrsq
-    Until plains_found = True 
-	PLAYER_REGION = 10
-	REGION_FLOOR_IMG = GenerateRegionFloor(IdToBiome(PLAYER_REGION))
-    UpdateLOS()
-EndIf 
-
-draw_map = true
-dim Biome_Img(7,3)
-global Biome_Img()
-LoadBiomeImgs(7)
-Player_Map_Img = loadimage("gfx/mapplayer.png")
-Player_Map_Img2 = loadimage("gfx/mapplayerwater.png")
-world_fog = makeimage(16,16)
 Repeat
 
     Color cbwhite
 	drawimage background_img,0,0
     SetWindow Str(FPS()+" SEED:"+WORLD_SEED)
-    ShadeText(720,30, "Regions generated: "+RegionCount())
+    ShadeText(720,30, "Regions explored: "+RegionCount())
 	ShadeText(720,50, WORLD_OFFSET_X+" "+WORLD_OFFSET_Y)
     
     If draw_map = true
@@ -161,7 +52,6 @@ Repeat
 		EndIf 
 		FixOffset()
     Else
-		
         'If MouseHit(2) Then draw_map = true
     EndIf 
     
