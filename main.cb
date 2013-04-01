@@ -3,56 +3,56 @@ include "include/init.cb"
 Repeat
 
     Color cbwhite
-	drawimage background_img,0,0
+	drawimage backgroundImg,0,0
     SetWindow Str(FPS()+" SEED:"+WORLD_SEED)
     ShadeText(720,30, "Regions explored: "+RegionCount())
-	ShadeText(720,50, WORLD_OFFSET_X+" "+WORLD_OFFSET_Y)
+	ShadeText(720,50, worldOffsetX+" "+worldOffsetY)
     
-    If draw_map = true
+    If drawMap = true
         Randomize WORLD_SEED
-		Drawimage unexplored_img, 0, 0
-        For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
-			treetype = rand(3)
-			mountaintype = rand(2)
+		Drawimage unexploredImg, 0, 0
+        For wrsq.worldSquare = Each worldSquare
+			treeType = rand(3)
+			mountainType = rand(2)
 			GetBiomeColor(wrsq\biome) 
             if SquareOnScreen(wrsq\x,wrsq\y) and sight(wrsq\x,wrsq\y) <= -1
 				if wrsq\biome = 3
-					Drawimage Biome_Img(wrsq\biome,treetype),(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
+					Drawimage biomeImg(wrsq\biome,treeType),(wrsq\x+worldOffsetX)*BOX_SIZE,(wrsq\y+worldOffsetY)*BOX_SIZE
 				elseif wrsq\biome = 6
-					Drawimage Biome_Img(wrsq\biome,mountaintype),(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
+					Drawimage biomeImg(wrsq\biome,mountainType),(wrsq\x+worldOffsetX)*BOX_SIZE,(wrsq\y+worldOffsetY)*BOX_SIZE
 				else
-					Drawimage Biome_Img(wrsq\biome,0),(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
+					Drawimage biomeImg(wrsq\biome,0),(wrsq\x+worldOffsetX)*BOX_SIZE,(wrsq\y+worldOffsetY)*BOX_SIZE
 				endif 
-				If wrsq\id = PLAYER_REGION
-					world_player_x = wrsq\x
-					world_player_y = wrsq\y
+				If wrsq\id = playerRegion
+					worldPlayerX = wrsq\x
+					worldPlayerY = wrsq\y
 					if wrsq\biome = 0
-						Drawimage Player_Map_Img2,(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
+						Drawimage playerMapImg2,(wrsq\x+worldOffsetX)*BOX_SIZE,(wrsq\y+worldOffsetY)*BOX_SIZE
 					else
-						Drawimage Player_Map_Img,(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE
+						Drawimage playerMapImg,(wrsq\x+worldOffsetX)*BOX_SIZE,(wrsq\y+worldOffsetY)*BOX_SIZE
 					endif 
 				Endif 
-			if sight(wrsq\x,wrsq\y) = -1 then DrawGhostImage world_fog,(wrsq\x+WORLD_OFFSET_X)*BOX_SIZE,(wrsq\y+WORLD_OFFSET_Y)*BOX_SIZE, 0, FogThickness(wrsq\x,wrsq\y,world_player_x,world_player_y)
+			if sight(wrsq\x,wrsq\y) = -1 then DrawGhostImage worldFog,(wrsq\x+worldOffsetX)*BOX_SIZE,(wrsq\y+worldOffsetY)*BOX_SIZE, 0, FogThickness(wrsq\x,wrsq\y,worldPlayerX,worldPlayerY)
 			endif 
             
             If (MouseX()-10)/BOX_SIZE = wrsq\x And (MouseY()-10)/BOX_SIZE = wrsq\y
-                ShadeText(720,10,wrsq\x+" "+wrsq\y+" "+wrsq\id+" "+GetBiome(wrsq\biome)+" "+wrsq\town_name)
+                ShadeText(720,10,wrsq\x+" "+wrsq\y+" "+wrsq\id+" "+GetBiome(wrsq\biome)+" "+wrsq\townName)
             EndIf
         Next wrsq
 		If KeyHit(cbkeyright) then Travel(1,0)
 		If KeyHit(cbkeyleft) Then Travel(-1,0)
 		If KeyHit(cbkeydown) Then Travel(0,1)
 		If KeyHit(cbkeyup) Then Travel(0,-1)
-		if keyhit(cbkeyw) then WORLD_OFFSET_Y + 1
-		if keyhit(cbkeya) then WORLD_OFFSET_X + 1
-		if keyhit(cbkeys) then WORLD_OFFSET_Y - 1
-		if keyhit(cbkeyd) then WORLD_OFFSET_X - 1
+		if keyhit(cbkeyw) then worldOffsetY + 1
+		if keyhit(cbkeya) then worldOffsetX + 1
+		if keyhit(cbkeys) then worldOffsetY - 1
+		if keyhit(cbkeyd) then worldOffsetX - 1
 		If MouseHit(1)
-			'draw_map = false
+			'drawMap = false
 		EndIf 
 		FixOffset()
     Else
-        'If MouseHit(2) Then draw_map = true
+        'If MouseHit(2) Then drawMap = true
     EndIf 
     
     DrawScreen 

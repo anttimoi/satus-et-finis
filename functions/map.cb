@@ -1,72 +1,72 @@
 Function GenerateWorldMap(seed)
     Randomize seed
     Notify("Initializing world")
-    For x = 0 To WORLD_SIZE-1
-        For y = 0 To WORLD_SIZE-1
-            If x > 2 And x < WORLD_SIZE-3 And y > 2 And y < WORLD_SIZE-3
+    For x = 0 To worldSize-1
+        For y = 0 To worldSize-1
+            If x > 2 And x < worldSize-3 And y > 2 And y < worldSize-3
                 If Rand(100) < 58
-                    temp_map(x,y) = 1
+                    tempMap(x,y) = 1
                 Else 
-                    temp_map(x,y) = 0
+                    tempMap(x,y) = 0
                 EndIf 
             Else 
-                temp_map(x,y) = 0
+                tempMap(x,y) = 0
             EndIf  
         Next y
     Next x
     
     Notify("Creating oceans and land")
     For n = 1 To 6
-        For x = 0 To WORLD_SIZE-1
-            For y = 0 To WORLD_SIZE-1
-                If y = 0 Or y = WORLD_SIZE-1 Or x = 0 Or x = WORLD_SIZE-1
-                    temp_map(x,y) = 1
+        For x = 0 To worldSize-1
+            For y = 0 To worldSize-1
+                If y = 0 Or y = worldSize-1 Or x = 0 Or x = worldSize-1
+                    tempMap(x,y) = 1
                 Else
-                    If temp_map(x,y) = 1
+                    If tempMap(x,y) = 1
                         neighbours = 0
-                        For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
-                            For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                        For xx = Max(x-1,0) To Min(x+1,worldSize-1)
+                            For yy = Max(y-1,0) To Min(y+1,worldSize-1)
                                 If xx = x And yy = y
                                 Else
-                                    If temp_map(xx,yy) = 1 Then neighbours + 1
+                                    If tempMap(xx,yy) = 1 Then neighbours + 1
                                 EndIf 
                             Next yy
                         Next xx
-                        If neighbours >= 4 Then temp_map2(x,y) = 1 Else temp_map2(x,y) = 0
-                    ElseIf temp_map(x,y) = 0
+                        If neighbours >= 4 Then tempMap2(x,y) = 1 Else tempMap2(x,y) = 0
+                    ElseIf tempMap(x,y) = 0
                         neighbours = 0
-                        For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
-                            For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                        For xx = Max(x-1,0) To Min(x+1,worldSize-1)
+                            For yy = Max(y-1,0) To Min(y+1,worldSize-1)
                                 If xx = x And yy = y
                                 Else
-                                    If temp_map(xx,yy) = 1 Then neighbours + 1
+                                    If tempMap(xx,yy) = 1 Then neighbours + 1
                                 EndIf 
                             Next yy
                         Next xx      
-                        If neighbours >= 5 Then temp_map2(x,y) = 1 Else temp_map2(x,y) = 0
+                        If neighbours >= 5 Then tempMap2(x,y) = 1 Else tempMap2(x,y) = 0
                     Else
-                        temp_map2(x,y) = temp_map(x,y)
+                        tempMap2(x,y) = tempMap(x,y)
                     EndIf 
                 EndIf 
             Next y
         Next x
     
-        For x = 0 To WORLD_SIZE-1
-            For y = 0 To WORLD_SIZE-1
-                temp_map(x,y) = temp_map2(x,y)
+        For x = 0 To worldSize-1
+            For y = 0 To worldSize-1
+                tempMap(x,y) = tempMap2(x,y)
             Next y
         Next x
     Next n
     
     Notify("Making beaches")
-    For x = 0 To WORLD_SIZE-1
-        For y = 0 To WORLD_SIZE-1
-            If temp_map(x,y) = 1 
-                For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
-                    For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+    For x = 0 To worldSize-1
+        For y = 0 To worldSize-1
+            If tempMap(x,y) = 1 
+                For xx = Max(x-1,0) To Min(x+1,worldSize-1)
+                    For yy = Max(y-1,0) To Min(y+1,worldSize-1)
                         If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
                         Else
-                            If temp_map(xx,yy) = 0 And Rand(100) > 40 Then temp_map(x,y) = 2
+                            If tempMap(xx,yy) = 0 And Rand(100) > 40 Then tempMap(x,y) = 2
                         EndIf 
                     Next yy
                 Next xx                
@@ -75,34 +75,34 @@ Function GenerateWorldMap(seed)
     Next x
     
     Notify("Trimming beaches")
-    For x = 0 To WORLD_SIZE-1
-        For y = 0 To WORLD_SIZE-1
-            If temp_map(x,y) = 2 
+    For x = 0 To worldSize-1
+        For y = 0 To worldSize-1
+            If tempMap(x,y) = 2 
                 beach_found = False 
-                For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
-                    For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+                For xx = Max(x-1,0) To Min(x+1,worldSize-1)
+                    For yy = Max(y-1,0) To Min(y+1,worldSize-1)
                         If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
                         Else
-                            If temp_map(xx,yy) = 2 Then beach_found = True 
+                            If tempMap(xx,yy) = 2 Then beach_found = True 
                         EndIf 
                     Next yy
                 Next xx     
-            If beach_found = False Then temp_map(x,y) = 1
+            If beach_found = False Then tempMap(x,y) = 1
             EndIf 
         Next y 
     Next x   
     
     Notify("Growing forests")
-    For x = 0 To WORLD_SIZE-1
-        For y = 0 To WORLD_SIZE-1
+    For x = 0 To worldSize-1
+        For y = 0 To worldSize-1
             rd = Rand(-1,1)
-            If temp_map(x,y) = 1
+            If tempMap(x,y) = 1
                 sea_found = False 
                 For r = 0 To 90
                     xr# = x
                     yr# = y
                     While Distance(x,y,xr#,yr#) < 3+rd
-                        If temp_map(Int(xr#),Int(yr#)) = 0
+                        If tempMap(Int(xr#),Int(yr#)) = 0
                             sea_found = True 
                             Exit 
                         EndIf 
@@ -111,20 +111,20 @@ Function GenerateWorldMap(seed)
                     Wend
                     If sea_found = True Then Exit 
                 Next r
-                If sea_found = False Then temp_map(x,y) = 3
+                If sea_found = False Then tempMap(x,y) = 3
             EndIf 
         Next y 
     Next x   
     
     Notify("Making swamps")
-    For x = 0 To WORLD_SIZE-1
-        For y = 0 To WORLD_SIZE-1
-            If temp_map(x,y) = 1 
-                For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
-                    For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+    For x = 0 To worldSize-1
+        For y = 0 To worldSize-1
+            If tempMap(x,y) = 1 
+                For xx = Max(x-1,0) To Min(x+1,worldSize-1)
+                    For yy = Max(y-1,0) To Min(y+1,worldSize-1)
                         If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
                         Else
-                            If temp_map(xx,yy) = 0 And Rand(100) < 30 Then temp_map(x,y) = 5
+                            If tempMap(xx,yy) = 0 And Rand(100) < 30 Then tempMap(x,y) = 5
                         EndIf 
                     Next yy
                 Next xx                
@@ -132,14 +132,14 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x
     For n = 1 To 5
-        For x = 0 To WORLD_SIZE-1
-            For y = 0 To WORLD_SIZE-1
-                If temp_map(x,y) = 1 Or temp_map(x,y) = 2 
-                    For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
-                        For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+        For x = 0 To worldSize-1
+            For y = 0 To worldSize-1
+                If tempMap(x,y) = 1 Or tempMap(x,y) = 2 
+                    For xx = Max(x-1,0) To Min(x+1,worldSize-1)
+                        For yy = Max(y-1,0) To Min(y+1,worldSize-1)
                             If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
                             Else
-                                'If temp_map(xx,yy) = 5 And Rand(100) < 5 Then temp_map(x,y) = 5
+                                'If tempMap(xx,yy) = 5 And Rand(100) < 5 Then tempMap(x,y) = 5
                             EndIf 
                         Next yy
                     Next xx                
@@ -149,37 +149,37 @@ Function GenerateWorldMap(seed)
     Next n
     
     Notify("Growing hills")
-    For x = 0 To WORLD_SIZE-1
-        For y = 0 To WORLD_SIZE-1
-            If temp_map(x,y) = 3
-                plains_found = False 
+    For x = 0 To worldSize-1
+        For y = 0 To worldSize-1
+            If tempMap(x,y) = 3
+                plainsFound = False 
                 For r = 0 To 90
                     xr# = x
                     yr# = y
                     While Distance(x,y,xr#,yr#) < 3
-                        If temp_map(Int(xr#),Int(yr#)) = 1
-                            plains_found = True 
+                        If tempMap(Int(xr#),Int(yr#)) = 1
+                            plainsFound = True 
                             Exit 
                         EndIf 
                         xr# = xr# + 0.5*Cos(r*4)
                         yr# = yr# + 0.5*Sin(r*4)
                     Wend
-                    If plains_found = True Then Exit 
+                    If plainsFound = True Then Exit 
                 Next r
-                If plains_found = False Then temp_map(x,y) = 6
+                If plainsFound = False Then tempMap(x,y) = 6
             EndIf 
         Next y 
     Next x   
     
     Notify("Smoothing hillside")
-    For x = 0 To WORLD_SIZE-1
-        For y = 0 To WORLD_SIZE-1
-            If temp_map(x,y) = 3 
-                For xx = Max(x-1,0) To Min(x+1,WORLD_SIZE-1)
-                    For yy = Max(y-1,0) To Min(y+1,WORLD_SIZE-1)
+    For x = 0 To worldSize-1
+        For y = 0 To worldSize-1
+            If tempMap(x,y) = 3 
+                For xx = Max(x-1,0) To Min(x+1,worldSize-1)
+                    For yy = Max(y-1,0) To Min(y+1,worldSize-1)
                         If (xx = x And yy = y) Or Abs(x-xx)+Abs(y-yy)=2
                         Else
-                            If temp_map(xx,yy) = 6 Then temp_map(x,y) = 7
+                            If tempMap(xx,yy) = 6 Then tempMap(x,y) = 7
                         EndIf 
                     Next yy
                 Next xx                
@@ -191,34 +191,34 @@ Function GenerateWorldMap(seed)
     town_count = 0
     While town_count <= 10
         attempts = attempts + 1
-        x = Rand(WORLD_SIZE-1)
-        y = Rand(WORLD_SIZE-1)
-        If temp_map(x,y) = 1
-			temp_map(x,y) = 4
+        x = Rand(worldSize-1)
+        y = Rand(worldSize-1)
+        If tempMap(x,y) = 1
+			tempMap(x,y) = 4
 			town_count = town_count + 1
         EndIf 
     Wend 
     
     Notify("Finishing")
-    For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
+    For wrsq.worldSquare = Each worldSquare
         Delete wrsq
     Next wrsq
     
     id = 0
-    For y = 0 To WORLD_SIZE-1
-        For x = 0 To WORLD_SIZE-1
-            wrsq.WORLD_SQUARE = New(WORLD_SQUARE)
+    For y = 0 To worldSize-1
+        For x = 0 To worldSize-1
+            wrsq.worldSquare = New(worldSquare)
             wrsq\x = x
             wrsq\y = y
             wrsq\id = id
 			wrsq\visited = false
             id = id+1
-            If x = 0 or y = 0 Or x = WORLD_SIZE-1 or y = WORLD_SIZE-1
+            If x = 0 or y = 0 Or x = worldSize-1 or y = worldSize-1
                 'wrsq\biome = 0
             Else 
-                wrsq\biome = temp_map(x,y)
+                wrsq\biome = tempMap(x,y)
             EndIf 
-            If wrsq\biome = 4 Then wrsq\town_name = RandomName()
+            If wrsq\biome = 4 Then wrsq\townName = RandomName()
             
         Next x
     Next y
@@ -227,17 +227,17 @@ End Function
 
 Function RegionCount()
 	c = 0
-	For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
+	For wrsq.worldSquare = Each worldSquare
 		if wrsq\visited = true then c+1
 	Next wrsq
 	return c
 End Function 
 
 Function GenerateRegionFloor(id)
-	img = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
+	img = MakeImage(regionSize*BOX_SIZE,regionSize*BOX_SIZE)
 	DrawToImage img
-	For x = 0 To REGION_SIZE-1
-		For y = 0 To REGION_SIZE-1
+	For x = 0 To regionSize-1
+		For y = 0 To regionSize-1
 			GetBiomeColor(id)    
 			Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
 		Next y
@@ -248,17 +248,17 @@ End Function
 
 Function Travel(x,y)
 	'Loading()
-    For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
-        If wrsq\id = PLAYER_REGION
+    For wrsq.worldSquare = Each worldSquare
+        If wrsq\id = playerRegion
             current_x = wrsq\x
             current_y = wrsq\y
             Exit 
         EndIf 
     Next wrsq
-    For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
+    For wrsq.worldSquare = Each worldSquare
         If wrsq\x = current_x+x And wrsq\y = current_y+y 
 			wrsq\visited = true
-            PLAYER_REGION = wrsq\id
+            playerRegion = wrsq\id
         EndIf 
     Next wrsq    
     UpdateLOS()
@@ -286,14 +286,14 @@ End Function
 
 Function LoadBiomeImgs(n)
 	for i = 0 to n
-		Biome_Img(i,0) = Loadimage("gfx/"+i+".png")
+		biomeImg(i,0) = Loadimage("gfx/"+i+".png")
 		if i = 3
 			for x = 1 to 3
-				Biome_Img(i,x) = Loadimage("gfx/"+i+"_"+x+".png")
+				biomeImg(i,x) = Loadimage("gfx/"+i+"_"+x+".png")
 			next x
 		elseif i = 6
 			for x = 1 to 2
-				Biome_Img(i,x) = Loadimage("gfx/"+i+"_"+x+".png")
+				biomeImg(i,x) = Loadimage("gfx/"+i+"_"+x+".png")
 			next x			
 		endif 
 	next i
@@ -320,13 +320,13 @@ Function GetBiomeColor(id)
 End Function 
 
 Function UpdateLOS()
-	for x = 0 to WORLD_SIZE
-		for y = 0 to WORLD_SIZE
+	for x = 0 to worldSize
+		for y = 0 to worldSize
 			if sight(x,y) = -2 then sight(x,y) = -1
 		next y
 	next x
-    For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
-        If wrsq\id = PLAYER_REGION
+    For wrsq.worldSquare = Each worldSquare
+        If wrsq\id = playerRegion
             x = wrsq\x
             y = wrsq\y
 			sight(x,y) = -2
@@ -338,8 +338,8 @@ Function UpdateLOS()
 		steps = 10
 		n = 0
         while steps > 0
-			xx# = min(WORLD_SIZE-1,max(0,xx# + cos(r*4)))
-			yy# = min(WORLD_SIZE-1,max(0,yy# + sin(r*4)))
+			xx# = min(worldSize-1,max(0,xx# + cos(r*4)))
+			yy# = min(worldSize-1,max(0,yy# + sin(r*4)))
 			if biome(int(xx#),int(yy#)) = 0
 				steps = steps-1
 			elseif biome(int(xx#),int(yy#)) = 1 or biome(int(xx#),int(yy#)) = 2 or biome(int(xx#),int(yy#)) = 4 or biome(int(xx#),int(yy#)) = 5
@@ -358,7 +358,7 @@ Function UpdateLOS()
 End Function 
 
 function IdToBiome(id)
-	for wrsq.WORLD_SQUARE = each WORLD_SQUARE
+	for wrsq.worldSquare = each worldSquare
 		if wrsq\id = id
 			return wrsq\biome
 		endif
@@ -366,21 +366,21 @@ function IdToBiome(id)
 end function 
 
 function SquareOnScreen(x,y)
-	if (x+WORLD_OFFSET_X < REGION_SIZE) and (y+WORLD_OFFSET_Y < REGION_SIZE) then return true else return false
+	if (x+worldOffsetX < regionSize) and (y+worldOffsetY < regionSize) then return true else return false
 end function 
 
 function FixOffset()
-	for wrsq.WORLD_SQUARE = each WORLD_SQUARE
-		if wrsq\id = PLAYER_REGION
+	for wrsq.worldSquare = each worldSquare
+		if wrsq\id = playerRegion
 			player_x = wrsq\x
 			player_y = wrsq\y
 		endif
 	next wrsq
 	
-	if player_x+5 >= REGION_SIZE-WORLD_OFFSET_X then WORLD_OFFSET_X = max(REGION_SIZE-WORLD_SIZE,WORLD_OFFSET_X-1)
-	if player_y+5 >= REGION_SIZE-WORLD_OFFSET_Y then WORLD_OFFSET_Y = max(REGION_SIZE-WORLD_SIZE,WORLD_OFFSET_Y-1)
-	if player_x-5 < -WORLD_OFFSET_X then WORLD_OFFSET_X = min(0,WORLD_OFFSET_X+1)
-	if player_y-5 < -WORLD_OFFSET_Y then WORLD_OFFSET_Y = min(0,WORLD_OFFSET_Y+1)
+	if player_x+5 >= regionSize-worldOffsetX then worldOffsetX = max(regionSize-worldSize,worldOffsetX-1)
+	if player_y+5 >= regionSize-worldOffsetY then worldOffsetY = max(regionSize-worldSize,worldOffsetY-1)
+	if player_x-5 < -worldOffsetX then worldOffsetX = min(0,worldOffsetX+1)
+	if player_y-5 < -worldOffsetY then worldOffsetY = min(0,worldOffsetY+1)
 end function 
 
 function FogThickness(x,y,player_x,player_y)

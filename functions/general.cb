@@ -112,8 +112,8 @@ Function RandomName()
 End Function 
 
 function GenerateBackground()
-	background_img = makeimage(screenwidth(),screenheight())
-	drawtoimage background_img
+	backgroundImg = makeimage(screenwidth(),screenheight())
+	drawtoimage backgroundImg
 		for x = 0 to screenwidth()/10-1
 			for y = 0 to screenheight()/10-1
 				if y = 0 or x = 0 or x = screenwidth()/10-1 or y = screenheight()/10-1 or x = 72
@@ -126,21 +126,21 @@ function GenerateBackground()
 			next y
 		next x
 	drawtoscreen
-	return background_img
+	return backgroundImg
 end function 
 
 function GenerateUnexplored()
-	unexplored_img = MakeImage(REGION_SIZE*BOX_SIZE,REGION_SIZE*BOX_SIZE)
-	DrawToImage unexplored_Img
-		for x = 0 to REGION_SIZE-1
-			for y = 0 to REGION_SIZE-1
+	unexploredImg = MakeImage(regionSize*BOX_SIZE,regionSize*BOX_SIZE)
+	DrawToImage unexploredImg
+		for x = 0 to regionSize-1
+			for y = 0 to regionSize-1
 				c = rand(0,10)
 				color c, c, c	
 				Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
 			next y
 		next x
 	DrawToScreen
-	return unexplored_img
+	return unexploredImg
 DrawToScreen
 
 end function
@@ -153,6 +153,6 @@ Function ShadeText(x,y,txt$,r=255,g=255,b=255)
 End Function
 
 Function Loading()
-	ShadeText(10+(WORLD_SIZE*BOX_SIZE)/2-textwidth("Loading, please wait...")/2,10+(WORLD_SIZE*BOX_SIZE)/2,"Loading, please wait...")
+	ShadeText(10+(worldSize*BOX_SIZE)/2-textwidth("Loading, please wait...")/2,10+(worldSize*BOX_SIZE)/2,"Loading, please wait...")
 	Drawscreen 
 End Function

@@ -4,71 +4,71 @@ locate 10, 10
 
 DefaultMask ON, cbmagenta
 
-Type WORLD_SQUARE
+Type worldSquare
     Field id
     Field x
     Field y
     Field biome
-    Field town_name As String
+    Field townName As String
 	Field visited
 End Type 
 
-Global PLAYER_REGION
-Global WORLD_SIZE, REGION_SIZE, WORLD_SEED, BOX_SIZE
-Global WORLD_OFFSET_X, WORLD_OFFSET_Y
+Global playerRegion
+Global worldSize, regionSize, worldSeed, boxSize
+Global worldOffsetX, worldOffsetY
 
-WORLD_SIZE = 100
-REGION_SIZE = 45
-WORLD_SEED = Rand(200000000)
-BOX_SIZE = 16  
-WORLD_OFFSET_X = 0
-WORLD_OFFSET_Y = 0
+worldSize = 100
+regionSize = 45
+worldSeed = Rand(200000000)
+boxSize = 16  
+worldOffsetX = 0
+worldOffsetY = 0
 
-Dim temp_map(WORLD_SIZE-1,WORLD_SIZE-1)
-Dim temp_map2(WORLD_SIZE-1,WORLD_SIZE-1)
-Global temp_map()
-Global temp_map2()
+Dim tempMap(worldSize-1,worldSize-1)
+Dim tempMap2(worldSize-1,worldSize-1)
+Global tempMap()
+Global tempMap2()
 
-background_img = GenerateBackground()
-unexplored_img = GenerateUnexplored()
+backgroundImg = GenerateBackground()
+unexploredImg = GenerateUnexplored()
 
-font_default = loadfont("Fixedsys500c.ttf",15)
-setfont font_default
+fontDefault = loadfont("Fixedsys500c.ttf",15)
+setfont fontDefault
 
 Notify("Starting a new game!")
 
-GenerateWorldMap(WORLD_SEED)
+GenerateWorldMap(worldSeed)
 
-Dim sight(WORLD_SIZE-1,WORLD_SIZE-1)
-Dim biome(WORLD_SIZE-1,WORLD_SIZE-1)
+Dim sight(worldSize-1,worldSize-1)
+Dim biome(worldSize-1,worldSize-1)
 Global sight()
 Global biome()
 
-for wrsq.WORLD_SQUARE = each WORLD_SQUARE
+for wrsq.worldSquare = each worldSquare
 	sight(wrsq\x,wrsq\y) = 0
 	biome(wrsq\x,wrsq\y) = wrsq\biome
 next wrsq
 
 Repeat
-	plains_found = False 
-	PLAYER_REGION = Rand(WORLD_SIZE^2)
-	For wrsq.WORLD_SQUARE = Each WORLD_SQUARE
-		If PLAYER_REGION = wrsq\id And wrsq\biome = 1
-			plains_found = True
+	plainsFound = False 
+	playerRegion = Rand(worldSize^2)
+	For wrsq.worldSquare = Each worldSquare
+		If playerRegion = wrsq\id And wrsq\biome = 1
+			plainsFound = True
 			wrsq\visited = true
 		EndIf 
 	Next wrsq
-Until plains_found = True 
-REGION_FLOOR_IMG = GenerateRegionFloor(IdToBiome(PLAYER_REGION))
+Until plainsFound = True 
+
 UpdateLOS()
-for i = 0 to WORLD_SIZE*2
+for i = 0 to worldSize*2
 	FixOffset()
 next i
 
 draw_map = true
-dim Biome_Img(7,3)
-global Biome_Img()
+dim biomeImg(7,3)
+global biomeImg()
 LoadBiomeImgs(7)
-Player_Map_Img = loadimage("gfx/mapplayer.png")
-Player_Map_Img2 = loadimage("gfx/mapplayerwater.png")
-world_fog = makeimage(16,16)
+playerMapImg = loadimage("gfx/mapplayer.png")
+playerMapImg2 = loadimage("gfx/mapplayerwater.png")
+worldFog = makeimage(16,16)
