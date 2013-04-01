@@ -1,6 +1,6 @@
 Function GenerateWorldMap(seed)
     Randomize seed
-    Notify("Initializing world")
+    NotIfy("Initializing world")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If x > 2 And x < worldSize-3 And y > 2 And y < worldSize-3
@@ -15,7 +15,7 @@ Function GenerateWorldMap(seed)
         Next y
     Next x
     
-    Notify("Creating oceans and land")
+    NotIfy("Creating oceans and land")
     For n = 1 To 6
         For x = 0 To worldSize-1
             For y = 0 To worldSize-1
@@ -58,7 +58,7 @@ Function GenerateWorldMap(seed)
         Next x
     Next n
     
-    Notify("Making beaches")
+    NotIfy("Making beaches")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 1 
@@ -74,7 +74,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x
     
-    Notify("Trimming beaches")
+    NotIfy("Trimming beaches")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 2 
@@ -92,7 +92,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x   
     
-    Notify("Growing forests")
+    NotIfy("Growing Forests")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             rd = Rand(-1,1)
@@ -116,7 +116,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x   
     
-    Notify("Making swamps")
+    NotIfy("Making swamps")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 1 
@@ -148,7 +148,7 @@ Function GenerateWorldMap(seed)
         Next x        
     Next n
     
-    Notify("Growing hills")
+    NotIfy("Growing hills")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 3
@@ -171,7 +171,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x   
     
-    Notify("Smoothing hillside")
+    NotIfy("Smoothing hillside")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 3 
@@ -187,7 +187,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x
     
-    Notify("Building towns")
+    NotIfy("Building towns")
     town_count = 0
     While town_count <= 10
         attempts = attempts + 1
@@ -199,7 +199,7 @@ Function GenerateWorldMap(seed)
         EndIf 
     Wend 
     
-    Notify("Finishing")
+    NotIfy("Finishing")
     For wrsq.worldSquare = Each worldSquare
         Delete wrsq
     Next wrsq
@@ -211,7 +211,7 @@ Function GenerateWorldMap(seed)
             wrsq\x = x
             wrsq\y = y
             wrsq\id = id
-			wrsq\visited = false
+			wrsq\visited = False
             id = id+1
             If x = 0 or y = 0 Or x = worldSize-1 or y = worldSize-1
                 'wrsq\biome = 0
@@ -223,28 +223,15 @@ Function GenerateWorldMap(seed)
         Next x
     Next y
     ClearText 
-End Function 
+End Function
 
 Function RegionCount()
 	c = 0
 	For wrsq.worldSquare = Each worldSquare
-		if wrsq\visited = true then c+1
+		If wrsq\visited = True Then c+1
 	Next wrsq
-	return c
-End Function 
-
-Function GenerateRegionFloor(id)
-	img = MakeImage(regionSize*BOX_SIZE,regionSize*BOX_SIZE)
-	DrawToImage img
-	For x = 0 To regionSize-1
-		For y = 0 To regionSize-1
-			GetBiomeColor(id)    
-			Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
-		Next y
-	Next x
-    DrawToScreen 
-	return img
-End Function 
+	Return c
+End Function
 
 Function Travel(x,y)
 	'Loading()
@@ -257,12 +244,12 @@ Function Travel(x,y)
     Next wrsq
     For wrsq.worldSquare = Each worldSquare
         If wrsq\x = current_x+x And wrsq\y = current_y+y 
-			wrsq\visited = true
+			wrsq\visited = True
             playerRegion = wrsq\id
         EndIf 
     Next wrsq    
     UpdateLOS()
-End Function 
+End Function
 
 Function GetBiome(id)
     If id = 0
@@ -272,7 +259,7 @@ Function GetBiome(id)
     ElseIf id = 2
         Return "beach"
     ElseIf id = 3
-        Return "forest"
+        Return "Forest"
     ElseIf id = 4
         Return "town"
     ElseIf id = 5
@@ -282,22 +269,22 @@ Function GetBiome(id)
     ElseIf id = 7
         Return "hillside"
     EndIf 
-End Function 
+End Function
 
 Function LoadBiomeImgs(n)
-	for i = 0 to n
+	For i = 0 to n
 		biomeImg(i,0) = Loadimage("gfx/"+i+".png")
-		if i = 3
-			for x = 1 to 3
+		If i = 3
+			For x = 1 to 3
 				biomeImg(i,x) = Loadimage("gfx/"+i+"_"+x+".png")
-			next x
-		elseif i = 6
-			for x = 1 to 2
+			Next x
+		ElseIf i = 6
+			For x = 1 to 2
 				biomeImg(i,x) = Loadimage("gfx/"+i+"_"+x+".png")
-			next x			
-		endif 
-	next i
-End Function 
+			Next x			
+		endIf 
+	Next i
+End Function
 
 Function GetBiomeColor(id)
     If id = 0
@@ -317,14 +304,14 @@ Function GetBiomeColor(id)
     ElseIf id = 7
         Color Rand(75,125),Rand(125,170),Rand(75,125)
     EndIf     
-End Function 
+End Function
 
 Function UpdateLOS()
-	for x = 0 to worldSize
-		for y = 0 to worldSize
-			if sight(x,y) = -2 then sight(x,y) = -1
-		next y
-	next x
+	For x = 0 to worldSize
+		For y = 0 to worldSize
+			If sight(x,y) = -2 Then sight(x,y) = -1
+		Next y
+	Next x
     For wrsq.worldSquare = Each worldSquare
         If wrsq\id = playerRegion
             x = wrsq\x
@@ -337,53 +324,53 @@ Function UpdateLOS()
 		yy# = y
 		steps = 10
 		n = 0
-        while steps > 0
-			xx# = min(worldSize-1,max(0,xx# + cos(r*4)))
-			yy# = min(worldSize-1,max(0,yy# + sin(r*4)))
-			if biome(int(xx#),int(yy#)) = 0
+        While steps > 0
+			xx# = Min(worldSize-1,Max(0,xx# + cos(r*4)))
+			yy# = Min(worldSize-1,Max(0,yy# + sin(r*4)))
+			If biome(Int(xx#),Int(yy#)) = 0
 				steps = steps-1
-			elseif biome(int(xx#),int(yy#)) = 1 or biome(int(xx#),int(yy#)) = 2 or biome(int(xx#),int(yy#)) = 4 or biome(int(xx#),int(yy#)) = 5
+			ElseIf biome(Int(xx#),Int(yy#)) = 1 or biome(Int(xx#),Int(yy#)) = 2 or biome(Int(xx#),Int(yy#)) = 4 or biome(Int(xx#),Int(yy#)) = 5
 				steps = steps-3
-			elseif biome(int(xx#),int(yy#)) = 7 or biome(int(xx#),int(yy#)) = 6 
+			ElseIf biome(Int(xx#),Int(yy#)) = 7 or biome(Int(xx#),Int(yy#)) = 6 
 				steps = steps-6
-			else 
+			Else 
 				steps = steps-4
-			endif 
-			sight(int(xx#),int(yy#)) = -2
+			endIf 
+			sight(Int(xx#),Int(yy#)) = -2
 			
 			n = n+1
-			if n > 100 then exit
-		wend
+			If n > 100 Then Exit
+		Wend
     Next r
-End Function 
+End Function
 
-function IdToBiome(id)
-	for wrsq.worldSquare = each worldSquare
-		if wrsq\id = id
-			return wrsq\biome
-		endif
-	next wrsq
-end function 
+Function IdToBiome(id)
+	For wrsq.worldSquare = Each worldSquare
+		If wrsq\id = id
+			Return wrsq\biome
+		endIf
+	Next wrsq
+End Function
 
-function SquareOnScreen(x,y)
-	if (x+worldOffsetX < regionSize) and (y+worldOffsetY < regionSize) then return true else return false
-end function 
+Function IsSquareOnScreen(x,y)
+	If (x+worldOffsetX < regionSize) and (y+worldOffsetY < regionSize) Then Return True Else Return False
+End Function
 
-function FixOffset()
-	for wrsq.worldSquare = each worldSquare
-		if wrsq\id = playerRegion
-			player_x = wrsq\x
-			player_y = wrsq\y
-		endif
-	next wrsq
+Function FixOffset()
+	For wrsq.worldSquare = each worldSquare
+		If wrsq\id = playerRegion
+			playerX = wrsq\x
+			playerY = wrsq\y
+		endIf
+	Next wrsq
 	
-	if player_x+5 >= regionSize-worldOffsetX then worldOffsetX = max(regionSize-worldSize,worldOffsetX-1)
-	if player_y+5 >= regionSize-worldOffsetY then worldOffsetY = max(regionSize-worldSize,worldOffsetY-1)
-	if player_x-5 < -worldOffsetX then worldOffsetX = min(0,worldOffsetX+1)
-	if player_y-5 < -worldOffsetY then worldOffsetY = min(0,worldOffsetY+1)
-end function 
+	If playerX+5 >= regionSize-worldOffsetX Then worldOffsetX = Max(regionSize-worldSize,worldOffsetX-1)
+	If playerY+5 >= regionSize-worldOffsetY Then worldOffsetY = Max(regionSize-worldSize,worldOffsetY-1)
+	If playerX-5 < -worldOffsetX Then worldOffsetX = Min(0,worldOffsetX+1)
+	If playerY-5 < -worldOffsetY Then worldOffsetY = Min(0,worldOffsetY+1)
+End Function
 
-function FogThickness(x,y,player_x,player_y)
-	d = 3*distance( x,y,player_x,player_y)
-	return max(1,min(70,d))
-end function 
+Function FogThickness(x,y,playerX,playerY)
+	d = 3*Distance( x,y,playerX,playerY)
+	Return Max(1,Min(70,d))
+End Function

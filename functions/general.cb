@@ -1,15 +1,15 @@
-Function Notify(notification$)
-	color cbwhite
-    AddText notification$
+Function NotIfy(notIfication$)
+	color cbWhite
+    AddText notIfication$
     DrawScreen 
-End Function 
+End Function
 
 Function RandomName()
     
-    voc_max = 5
-    cons_max = 15
-    Dim vocals(voc_max) As String  // a e i o u y
-    Dim consonants(cons_max) As String // m n p b t d k g f v s z x h r l
+    voc_Max = 5
+    cons_Max = 15
+    Dim vocals(voc_Max) As String  // a e i o u y
+    Dim consonants(cons_Max) As String // m n p b t d k g f v s z x h r l
     
     vocals(0) = "a"
     vocals(1) = "e"
@@ -109,38 +109,38 @@ Function RandomName()
     EndIf 
     
     Return name$
-End Function 
+End Function
 
-function GenerateBackground()
+Function GenerateBackground()
 	backgroundImg = makeimage(screenwidth(),screenheight())
 	drawtoimage backgroundImg
-		for x = 0 to screenwidth()/10-1
-			for y = 0 to screenheight()/10-1
-				if y = 0 or x = 0 or x = screenwidth()/10-1 or y = screenheight()/10-1 or x = 72
-					c = rand(70,100)
+		For x = 0 to screenwidth()/10-1
+			For y = 0 to screenheight()/10-1
+				If y = 0 or x = 0 or x = screenwidth()/10-1 or y = screenheight()/10-1 or x = 72
+					c = Rand(70,100)
 					color c,c,c
-				else
-					color rand(90,110),rand(40,60),rand(10)
-				endif 
+				Else
+					color Rand(90,110),Rand(40,60),Rand(10)
+				endIf 
 				box x*10,y*10,10,10
-			next y
-		next x
+			Next y
+		Next x
 	drawtoscreen
-	return backgroundImg
-end function 
+	Return backgroundImg
+End Function
 
-function GenerateUnexplored()
-	unexploredImg = MakeImage(regionSize*BOX_SIZE,regionSize*BOX_SIZE)
+Function GenerateUnexplored()
+	unexploredImg = MakeImage(regionSize*squareSize,regionSize*squareSize)
 	DrawToImage unexploredImg
-		for x = 0 to regionSize-1
-			for y = 0 to regionSize-1
-				c = rand(0,10)
+		For x = 0 to regionSize-1
+			For y = 0 to regionSize-1
+				c = Rand(0,10)
 				color c, c, c	
-				Box x*BOX_SIZE,y*BOX_SIZE, BOX_SIZE, BOX_SIZE
-			next y
-		next x
+				Box x*squareSize,y*squareSize, squareSize, squareSize
+			Next y
+		Next x
 	DrawToScreen
-	return unexploredImg
+	Return unexploredImg
 DrawToScreen
 
 end function
@@ -150,9 +150,4 @@ Function ShadeText(x,y,txt$,r=255,g=255,b=255)
 	text x+1,y+1,txt$
 	color r,g,b
 	text x,y,txt$
-End Function
-
-Function Loading()
-	ShadeText(10+(worldSize*BOX_SIZE)/2-textwidth("Loading, please wait...")/2,10+(worldSize*BOX_SIZE)/2,"Loading, please wait...")
-	Drawscreen 
 End Function

@@ -14,13 +14,13 @@ Type worldSquare
 End Type 
 
 Global playerRegion
-Global worldSize, regionSize, worldSeed, boxSize
+Global worldSize, regionSize, worldSeed, squareSize
 Global worldOffsetX, worldOffsetY
 
 worldSize = 100
 regionSize = 45
 worldSeed = Rand(200000000)
-boxSize = 16  
+squareSize = 16  
 worldOffsetX = 0
 worldOffsetY = 0
 
@@ -32,10 +32,10 @@ Global tempMap2()
 backgroundImg = GenerateBackground()
 unexploredImg = GenerateUnexplored()
 
-fontDefault = loadfont("Fixedsys500c.ttf",15)
-setfont fontDefault
+fontDefault = LoadFont("Fixedsys500c.ttf",15)
+SetFont fontDefault
 
-Notify("Starting a new game!")
+NotIfy("Starting a new game!")
 
 GenerateWorldMap(worldSeed)
 
@@ -44,10 +44,10 @@ Dim biome(worldSize-1,worldSize-1)
 Global sight()
 Global biome()
 
-for wrsq.worldSquare = each worldSquare
+For wrsq.worldSquare = each worldSquare
 	sight(wrsq\x,wrsq\y) = 0
 	biome(wrsq\x,wrsq\y) = wrsq\biome
-next wrsq
+Next wrsq
 
 Repeat
 	plainsFound = False 
@@ -55,20 +55,20 @@ Repeat
 	For wrsq.worldSquare = Each worldSquare
 		If playerRegion = wrsq\id And wrsq\biome = 1
 			plainsFound = True
-			wrsq\visited = true
+			wrsq\visited = True
 		EndIf 
 	Next wrsq
 Until plainsFound = True 
 
 UpdateLOS()
-for i = 0 to worldSize*2
+For i = 0 to worldSize*2
 	FixOffset()
-next i
+Next i
 
-draw_map = true
-dim biomeImg(7,3)
-global biomeImg()
+drawMap = True
+Dim biomeImg(7,3)
+Global biomeImg()
 LoadBiomeImgs(7)
-playerMapImg = loadimage("gfx/mapplayer.png")
-playerMapImg2 = loadimage("gfx/mapplayerwater.png")
-worldFog = makeimage(16,16)
+playerMapImg = LoadImage("gfx/mapplayer.png")
+playerMapImg2 = LoadImage("gfx/mapplayerwater.png")
+worldFog = MakeImage(16,16)
