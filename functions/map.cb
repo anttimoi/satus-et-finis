@@ -1,6 +1,6 @@
 Function GenerateWorldMap(seed)
     Randomize seed
-    NotIfy("Initializing world")
+    Notify("Initializing world")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If x > 2 And x < worldSize-3 And y > 2 And y < worldSize-3
@@ -15,7 +15,7 @@ Function GenerateWorldMap(seed)
         Next y
     Next x
     
-    NotIfy("Creating oceans and land")
+    Notify("Creating oceans and land")
     For n = 1 To 6
         For x = 0 To worldSize-1
             For y = 0 To worldSize-1
@@ -58,7 +58,7 @@ Function GenerateWorldMap(seed)
         Next x
     Next n
     
-    NotIfy("Making beaches")
+    Notify("Making beaches")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 1 
@@ -74,7 +74,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x
     
-    NotIfy("Trimming beaches")
+    Notify("Trimming beaches")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 2 
@@ -92,7 +92,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x   
     
-    NotIfy("Growing Forests")
+    Notify("Growing Forests")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             rd = Rand(-1,1)
@@ -116,7 +116,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x   
     
-    NotIfy("Making swamps")
+    Notify("Making swamps")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 1 
@@ -148,7 +148,7 @@ Function GenerateWorldMap(seed)
         Next x        
     Next n
     
-    NotIfy("Growing hills")
+    Notify("Growing hills")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 3
@@ -171,7 +171,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x   
     
-    NotIfy("Smoothing hillside")
+    Notify("Smoothing hillside")
     For x = 0 To worldSize-1
         For y = 0 To worldSize-1
             If tempMap(x,y) = 3 
@@ -187,7 +187,7 @@ Function GenerateWorldMap(seed)
         Next y 
     Next x
     
-    NotIfy("Building towns")
+    Notify("Building towns")
     town_count = 0
     While town_count <= 10
         attempts = attempts + 1
@@ -199,7 +199,7 @@ Function GenerateWorldMap(seed)
         EndIf 
     Wend 
     
-    NotIfy("Finishing")
+    Notify("Finishing")
     For wrsq.worldSquare = Each worldSquare
         Delete wrsq
     Next wrsq

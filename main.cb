@@ -48,11 +48,15 @@ Repeat
 		If keyhit(cbkeys) then worldOffsetY - 1
 		If keyhit(cbkeyd) then worldOffsetX - 1
 		If MouseHit(1)
-			'drawMap = False
+			drawMap = False
+			playerRegionX = 64
 		EndIf 
 		FixOffset()
     Else
-        'If MouseHit(2) Then drawMap = True
+        drawImage plainsImg, 0, 0
+		drawImage playerRegionImg, playerRegionX, 400
+		drawImage playerAttack1, playerRegionX + 32, 400, (timer()/50 mod 4)
+		playerRegionX = playerRegionX + 3*(RightKey() - LeftKey())
     EndIf 
     
     DrawScreen 

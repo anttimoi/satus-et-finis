@@ -1,5 +1,5 @@
 SCREEN 1280,720
-FrameLimit 30 
+FrameLimit 60 
 locate 10, 10
 
 DefaultMask ON, cbmagenta
@@ -35,7 +35,7 @@ unexploredImg = GenerateUnexplored()
 fontDefault = LoadFont("Fixedsys500c.ttf",15)
 SetFont fontDefault
 
-NotIfy("Starting a new game!")
+Notify("Starting a new game!")
 
 GenerateWorldMap(worldSeed)
 
@@ -71,4 +71,7 @@ Global biomeImg()
 LoadBiomeImgs(7)
 playerMapImg = LoadImage("gfx/mapplayer.png")
 playerMapImg2 = LoadImage("gfx/mapplayerwater.png")
+playerRegionImg = LoadImage("gfx/player.png")
+playerAttack1 = LoadAnimImage("gfx/attack.png", 32, 64, 0, 4)
+plainsImg = LoadImage("gfx/plains.png")
 worldFog = MakeImage(16,16)

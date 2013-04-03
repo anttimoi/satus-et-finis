@@ -1,4 +1,4 @@
-Function NotIfy(notIfication$)
+Function Notify(notIfication$)
 	color cbWhite
     AddText notIfication$
     DrawScreen 
