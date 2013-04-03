@@ -1,14 +1,13 @@
 include "include/init.cb"
 
 Repeat
-
-    Color cbWhite
-	drawimage backgroundImg,0,0
-    SetWindow Str(FPS()+" SEED:"+WORLD_SEED)
-    ShadeText(720,30, "Regions explored: "+RegionCount())
-	ShadeText(720,50, worldOffsetX+" "+worldOffsetY)
-    
+	SetFont fontDefault
     If drawMap = True
+	    Color cbWhite
+		drawimage backgroundImg,0,0
+		SetWindow Str(FPS()+" SEED:"+WORLD_SEED)
+		ShadeText(720,30, "Regions explored: "+RegionCount())
+		ShadeText(720,50, worldOffsetX+" "+worldOffsetY)
         Randomize WORLD_SEED
 		Drawimage unexploredImg, 0, 0
         For wrsq.worldSquare = Each worldSquare
@@ -43,23 +42,21 @@ Repeat
 		If KeyHit(cbkeyleft) Then Travel(-1,0)
 		If KeyHit(cbkeydown) Then Travel(0,1)
 		If KeyHit(cbkeyup) Then Travel(0,-1)
-		If keyhit(cbkeyw) then worldOffsetY + 1
-		If keyhit(cbkeya) then worldOffsetX + 1
-		If keyhit(cbkeys) then worldOffsetY - 1
-		If keyhit(cbkeyd) then worldOffsetX - 1
-		If MouseHit(1)
-			'drawMap = False
-		EndIf 
 		FixOffset()
-    Else
-        'If MouseHit(2) Then drawMap = True
+    ElseIf drawMainMenu = True
+        GoSub MainMenu
     EndIf 
     
-    DrawScreen 
+    If EscapeKey()
+		drawMap = False
+		drawMainMenu = True
+	Endif 
     
-    If KeyHit(cbkeyescape) Then Exit 
+    DrawScreen 
+
     
 Forever
 
+Include "include/menu.cb"
 Include "functions/general.cb"
 Include "functions/map.cb"

@@ -1,6 +1,7 @@
 SCREEN 1280,720
 FrameLimit 60 
 locate 10, 10
+SafeExit OFF
 
 gameTitle$ = "Satus Et Finis"
 gameVersion$ = "0.1 ALPHA"
@@ -15,164 +16,12 @@ creditsMenu = False
 howtoMenu = False
 quitMenu = False
 mainMenu = True
+gameRunning = False
 Repeat
-
-	DrawImage menuBackgroundImg, 0, 0
-	SetFont fontBig
-	color cbBlack
-	Text ScreenWidth()/2-TextWidth(gameTitle$)/2,105,gameTitle$
-	color cbWhite
-	Text ScreenWidth()/2-TextWidth(gameTitle$)/2,100-(sin(timer()/8)+1)*5,gameTitle$
-	
-	SetFont fontDefault
-	color cbBlack
-	Text ScreenWidth()/2-TextWidth("- Version "+gameVersion$+" -")/2,202,"- Version "+gameVersion$+" -"
-	color cbWhite
-	Text ScreenWidth()/2-TextWidth("- Version "+gameVersion$+" -")/2,200,"- Version "+gameVersion$+" -"
-	
-	If mainMenu = True
-		If KeyHit(cbkeydown)
-			highlight+1
-		ElseIf KeyHit(cbkeyup)
-			highlight-1
-		EndIf
-		
-		If KeyHit(cbkeyreturn)
-			If highlight = 0
-				startGame = True
-			ElseIf highlight = 1
-				mainMenu = False
-				howtoMenu = True
-				ClearKeys
-			ElseIf highlight = 2
-				mainMenu = False
-				creditsMenu = True
-				ClearKeys
-			ElseIf highlight = 3
-				mainMenu = False
-				quitMenu = True
-				highlight = 1
-				ClearKeys
-			Endif 
-		EndIf 
-		
-		If highlight = -1 Then highlight = 3
-		If highlight = 4 Then highlight = 0
-		
-		SetFont fontMedium
-		For i = 0 to 3
-			If i = 0 
-				menuText$ = "Start Game"
-			ElseIf i = 1
-				menuText$ = "How To Play?"
-			ElseIf i = 2
-				menuText$ = "Credits"
-			ElseIf i = 3
-				menuText$ = "Quit"
-			Endif 
-			If highlight = i
-				bumpText = 3-(sin(180+timer()/4)+1)
-				menuText$ = "- "+menuText$+" -"
-			else
-				bumpText = 0
-			EndIf 
-			color cbBlack
-			Text ScreenWidth()/2-TextWidth(menuText$)/2,303+i*60,menuText$
-			color cbWhite
-			Text ScreenWidth()/2-TextWidth(menuText$)/2,300+i*60-bumpText,menuText$
-		Next i
-	ElseIf creditsMenu = True
-		SetFont fontMedium
-		For i = 0 to 3
-			If i = 0 
-				menuText$ = "Programming - anttimoi"
-			ElseIf i = 1
-				menuText$ = "Graphics - anttimoi"
-			ElseIf i = 2
-				menuText$ = "Music - missingo"
-			ElseIf i = 3
-				menuText$ = "Everything else - anttimoi"
-			Endif 
-			
-			color cbBlack
-			Text ScreenWidth()/2-TextWidth(menuText$)/2,303+i*60,menuText$
-			color cbWhite
-			Text ScreenWidth()/2-TextWidth(menuText$)/2,300+i*60,menuText$
-		Next i
-		If KeyHit(cbkeyescape) or KeyHit(cbkeyreturn)
-			creditsMenu = False
-			mainMenu = True
-		EndIf
-	ElseIf howtoMenu = True
-		SetFont fontMedium
-		For i = 0 to 3
-			If i = 0 
-				menuText$ = "Move your character with arrow keys."
-			ElseIf i = 1
-				menuText$ = "That's"
-			ElseIf i = 2
-				menuText$ = "about"
-			ElseIf i = 3
-				menuText$ = "it... so far..."
-			Endif 
-			
-			color cbBlack
-			Text ScreenWidth()/2-TextWidth(menuText$)/2,303+i*60,menuText$
-			color cbWhite
-			Text ScreenWidth()/2-TextWidth(menuText$)/2,300+i*60,menuText$
-		Next i
-		If KeyHit(cbkeyescape) or KeyHit(cbkeyreturn)
-			howtoMenu = False
-			mainMenu = True
-		EndIf	
-	ElseIf quitMenu = True	
-		SetFont fontDefault
-				
-		If highlight = 0 Then highlight = 2
-		If highlight = 3 Then highlight = 1
-		
-		If KeyHit(cbkeydown)
-			highlight+1
-		ElseIf KeyHit(cbkeyup)
-			highlight-1
-		EndIf
-		
-		If KeyHit(cbkeyreturn)
-			If highlight = 1
-				End
-			ElseIf highlight = 2
-				mainMenu = True
-				quitMenu = False
-				highlight = 0
-				ClearKeys
-			Endif 
-		EndIf 
-		
-		SetFont fontMedium
-		For i = 0 to 2
-			If i = 0 
-				menuText$ = "Rly Quit?"
-			ElseIf i = 1
-				menuText$ = "YA'RLY!"
-			ElseIf i = 2
-				menuText$ = "NO'RLY!"
-			Endif 
-			If highlight = i
-				bumpText = 3-(sin(180+timer()/4)+1)
-				menuText$ = "- "+menuText$+" -"
-			else
-				bumpText = 0
-			EndIf 
-			color cbBlack
-			Text ScreenWidth()/2-TextWidth(menuText$)/2,303+i*60,menuText$
-			color cbWhite
-			Text ScreenWidth()/2-TextWidth(menuText$)/2,300+i*60-bumpText,menuText$
-		Next i			
-	EndIf
-
+	GoSub MainMenu
 	DrawScreen
-
 Until startGame = True
+gameRunning = True
 
 SetFont fontDefault
 
