@@ -138,7 +138,18 @@ Function GenerateMenuBackground()
 					c = Rand(70,100)
 					color c,c,c
 				Else
-					color Rand(90,110),Rand(40,60),Rand(10)
+					If Distance(x,y,screenwidth()/20,screenheight()/20) > 50+Rand(10)
+						color Rand(50,80),Rand(100,120),Rand(10)
+					ElseIf Abs(y-15) < 5+Rand(-1,1) And Abs(x-screenwidth()/20) < 35+Rand(10)	
+						'color Rand(10),Rand(40,60),Rand(90,110)
+						c = Rand(70,100)
+						color c,c,c
+					ElseIf Abs(x-screenwidth()/20) < 15+Rand(10)
+						c = Rand(70,100)
+						color c,c,c						
+					Else
+						color Rand(90,110),Rand(40,60),Rand(10)
+					Endif
 				endIf 
 				box x*10,y*10,10,10
 			Next y
