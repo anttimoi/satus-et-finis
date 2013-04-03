@@ -129,6 +129,24 @@ Function GenerateBackground()
 	Return backgroundImg
 End Function
 
+Function GenerateMenuBackground()
+	backgroundImg = makeimage(screenwidth(),screenheight())
+	drawtoimage backgroundImg
+		For x = 0 to screenwidth()/10-1
+			For y = 0 to screenheight()/10-1
+				If y = 0 or x = 0 or x = screenwidth()/10-1 or y = screenheight()/10-1
+					c = Rand(70,100)
+					color c,c,c
+				Else
+					color Rand(90,110),Rand(40,60),Rand(10)
+				endIf 
+				box x*10,y*10,10,10
+			Next y
+		Next x
+	drawtoscreen
+	Return backgroundImg
+End Function
+
 Function GenerateUnexplored()
 	unexploredImg = MakeImage(regionSize*squareSize,regionSize*squareSize)
 	DrawToImage unexploredImg
